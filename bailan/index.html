@@ -218,7 +218,7 @@ body {
 <div class="page active" id="page-home">
   <div class="home-container">
     <div class="home-hero">
-      <div class="home-illustration fade-in"><div class="home-illo-emoji">🦥</div></div>
+      <div class="home-illustration fade-in"><div class="home-illo-emoji">😴</div></div>
       <div class="home-badge fade-in d1">SLTI 人格测评</div>
       <h1 class="home-title fade-in d2">你的<span>摆烂人格</span><br>是什么类型？</h1>
       <p class="home-subtitle fade-in d3">基于 MBTI 框架 × 职场摸鱼行为学</p>
@@ -270,7 +270,7 @@ body {
 <div class="page" id="page-quiz">
   <div class="quiz-container">
     <div class="back-row">
-      <a href="../" class="back-link">← 首页</a>
+      <a href="javascript:go('home')" class="back-link">← 返回首页</a>
       <span class="progress-num" id="prog-label">1/10</span>
     </div>
     <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:10%"></div></div>
@@ -297,14 +297,14 @@ body {
 
 <script>
 var T = [
-  { code:'HTBS',name:'战术狐狸',emoji:'🦊',color:'#E8824A',colorLight:'#FDF0E8',tagline:'一切摸鱼都在 Excel 里算过 ROI',traits:['理性计算','精准摸鱼','收益至上','职场数学家'],desc:'你是职场中的精算师。每一次摸鱼背后都有严密的成本收益分析，你的 PRD 里甚至包含一份"不可见摸鱼时间预算表"。别人以为你在偷懒，其实你在优化投入产出比。' },
-  { code:'OTBL',name:'彻底树懒',emoji:'🦥',color:'#6DA88A',colorLight:'#EDF5F1',tagline:'我的职业规划就是没有规划',traits:['坦荡摆烂','绝不内耗','活在当下','快乐优先'],desc:'你是摆烂流派的开山祖师。从不掩饰、从不解释、从不动摇。你对 KPI 的态度就像对天气——无法改变就不去想。你的松弛感让卷王们既羡慕又愤怒。' },
-  { code:'HESR',name:'社畜乌龟',emoji:'🐢',color:'#7C8BB8',colorLight:'#EDEFF6',tagline:'想摆不敢摆，边骂边干到凌晨',traits:['表面努力','内心崩溃','偷偷摸鱼','循环内耗'],desc:'你是职场中最矛盾的存在。嘴上喊着摆烂，手上比谁都卷。你会在深夜加班时发一条"好想辞职"的朋友圈，然后设成仅自己可见。你需要一次真正的释放。' },
-  { code:'OEBS',name:'摸鱼章鱼',emoji:'🐙',color:'#D47A8C',colorLight:'#FCF1F3',tagline:'八只手同时摸，周报还能写三页',traits:['多线并行','效率奇高','深藏不露','生存大师'],desc:'你是职场生存的终极形态。同时摸鱼、开会、回消息、写周报，还能在站会上用三个数据点让老板点头。你不是在摸鱼，你是在用 20% 的时间完成 80% 的工作，剩下 80% 的时间和同事聊八卦。' },
-  { code:'HTBR',name:'哲思猫头鹰',emoji:'🦉',color:'#9B7EC4',colorLight:'#F5F1FA',tagline:'我能论证所有会议都是无效的，但我会准时参加',traits:['洞察本质','理性批判','嘴上摆烂','行动靠谱'],desc:'你是职场中的哲学家。你能从组织架构、信息熵和博弈论角度论证为什么周五下午开会是反人类的，但你依然会带着笔记准时出现。你的摆烂是形而上的——身在工作，心已出家。' },
-  { code:'OESL',name:'佛系熊猫',emoji:'🐼',color:'#5C9EAD',colorLight:'#EFF6F7',tagline:'需求能不能做？随缘吧',traits:['心态平和','与世无争','顺其自然','情绪稳定'],desc:'你是职场中的修行者。被砍需求？阿弥陀佛。被甩锅？善哉善哉。加班？缘分未到。你从不主动摆烂，只是对一切结果都报以微笑。同事们怀疑你是不是已经财务自由了。' },
-  { code:'HTSL',name:'暗中猫咪',emoji:'🐱',color:'#E8A858',colorLight:'#FDF6EC',tagline:'你以为我在写文档，其实我在刷小红书',traits:['伪装大师','演技在线','秘密摸鱼','精准伪装'],desc:'你拥有顶级的职场伪装术。你的屏幕永远排列着三份文档和五个 Excel，但没人知道其中四个窗口下面藏着微博、小红书和炒股软件。你的 Alt+Tab 手速已经达到职业电竞水平。' },
-  { code:'OTBR',name:'觉醒雄鹰',emoji:'🦅',color:'#C4635A',colorLight:'#FCF0EF',tagline:'看透职场本质，正在谋划个人事业',traits:['洞察力强','行动力猛','目标清晰','不破不立'],desc:'你不是在摆烂，你是在积蓄力量。你早已看透职场的荒诞与天花板，正把摸鱼的时间全部投入个人成长。当别人还在纠结要不要离职时，你的副业已经月入五位数。你不是摆烂，你是战略撤退。' }
+  { code:'OTBL',name:'躺学家',emoji:'🛌',color:'#6DA88A',colorLight:'#EDF5F1',tagline:'《论持久躺平：从入门到精通》',traits:['坦荡摆烂','坦率真诚','活在当下','快乐优先'],desc:'你是躺平学的终身教授。从不掩饰对工作的真实态度，从不内耗、从不解释、从不动摇。别人在纠结要不要努力的时候，你已经靠着"爱咋咋地"活出了松弛感的最高境界。' },
+  { code:'OTBR',name:'理想家',emoji:'🚀',color:'#C4635A',colorLight:'#FCF0EF',tagline:'摆烂是为了下一次更好的冲锋',traits:['目标清晰','行动力强','公开战略','不破不立'],desc:'你不是在摆烂，你是在战略休整。你从不躲躲藏藏，光明正大地告诉所有人：我在休息，为了更好的出发。当别人还在纠结要不要离职时，你的副业已经月入五位数。' },
+  { code:'OESL',name:'佛系er',emoji:'🧘',color:'#5C9EAD',colorLight:'#EFF6F7',tagline:'需求能不能做？随缘吧',traits:['心态平和','与世无争','顺其自然','情绪稳定'],desc:'你是职场中的修行者。被砍需求？阿弥陀佛。被甩锅？善哉善哉。加班？缘分未到。你从不焦虑，因为你知道——卷也是一天，躺也是一天，不如用最好的情绪过最从容的日子。' },
+  { code:'HTBL',name:'计算器',emoji:'🧮',color:'#E8824A',colorLight:'#FDF0E8',tagline:'一切摸鱼都在 Excel 里算过 ROI',traits:['理性计算','精准摸鱼','收益至上','暗中操作'],desc:'你是职场精算师。每一次摸鱼背后都有严密的成本收益分析。你不会让别人知道自己在摸鱼——因为曝光会降低收益。你是一个行走的 ROI 计算机，连发呆都在优化投入产出比。' },
+  { code:'HTBR',name:'清醒侠',emoji:'💡',color:'#9B7EC4',colorLight:'#F5F1FA',tagline:'我能论证所有会议都是无效的，但我准时参加',traits:['洞察本质','理性批判','嘴上摆烂','暗自发奋'],desc:'你是职场中的独醒人。你能从组织架构、信息熵和博弈论角度论证为什么加班是反人性的，但你依然会准时提交需求文档。你的摆烂是形而上的——身在格子间，心已入深山。' },
+  { code:'HTSL',name:'伪装帝',emoji:'🎭',color:'#E8A858',colorLight:'#FDF6EC',tagline:'你以为我在写文档，其实我在刷小红书',traits:['伪装大师','演技在线','秘密摸鱼','精准拿捏'],desc:'你拥有顶级的职场伪装术。你的屏幕永远排列着三份文档和五个 Excel，但没人知道其中四个窗口下面是微博、小红书和炒股软件。你的 Alt+Tab 手速已经达到职业电竞水平。' },
+  { code:'HEBR',name:'内耗星',emoji:'🔄',color:'#D47A8C',colorLight:'#FCF1F3',tagline:'想摆不敢摆，边崩溃边输出',traits:['表面努力','内心风暴','情绪驱动','循环消耗'],desc:'你是职场中最矛盾的存在。嘴上喊着摆烂，情绪上已经崩溃，但手上就是停不下来。独自承受一切，偷偷在厕所隔间深呼吸——然后若无其事地回去继续干活。你需要一次真正的释放。' },
+  { code:'HESR',name:'社畜王',emoji:'💼',color:'#7C8BB8',colorLight:'#EDEFF6',tagline:'世界以痛吻我，我报之以OKR',traits:['隐藏情绪','持续输出','表面平静','暗自盼望'],desc:'你是职场韧性的代言人。嘴上说着"不想干了"，身体却诚实地做完了所有待办。你把自己隐藏得很好——没人知道你有多累。但内心深处你始终相信：总有一天，一切都会有回报。' }
 ];
 
 var Q = [
