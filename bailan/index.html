@@ -129,6 +129,11 @@ body {
 .option-card { display: flex; align-items: center; gap: 14px; padding: 15px 18px; background: var(--card-bg); border: 1.5px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all var(--transition); box-shadow: var(--shadow-sm); }
 .option-card:hover { border-color: #7C9CD3; box-shadow: var(--shadow-md); transform: translateX(3px); }
 .option-card:active { transform: scale(0.985); }
+
+.opts-disabled .option-card,
+.opts-disabled .option-card:hover { pointer-events: none; border-color: var(--border); box-shadow: var(--shadow-sm); transform: none; }
+.opts-disabled .option-card:hover .option-letter { background: rgba(91, 111, 160, 0.06); color: #5B6FA0; }
+
 .option-letter { flex-shrink: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: rgba(91, 111, 160, 0.06); border-radius: 50%; font-family: var(--font-display); font-size: 0.78rem; color: #5B6FA0; font-weight: 700; transition: all var(--transition); }
 .option-card:hover .option-letter { background: #5B6FA0; color: #fff; }
 .option-text { font-size: 0.9rem; color: var(--text); line-height: 1.5; }
@@ -255,6 +260,7 @@ body {
         <div class="faq-a">你会拿到专属的 SLTI 四字母代码、人格名称、四维落点图、性格特质标签和详细解读。还能查看全部 8 种人格类型，看看你的同事朋友是哪一种。</div>
       </div>
     </div>
+    <div class="disclaimer fade-in d6" style="text-align:center;font-size:0.68rem;color:#B0AAA2;margin-top:8px;letter-spacing:0.04em;line-height:1.6">* 本测试仅供娱乐，基于打工人日常行为观察，并非科学心理测量工具</div>
   </div>
 </div>
 
@@ -378,12 +384,12 @@ function renderQ() {
   var q=Q[S.i], t=Q.length, pct=((S.i+1)/t)*100;
   var qt=document.getElementById('q-text'); qt.textContent=q.question;
   qt.style.opacity='0'; qt.style.transform='translateY(10px)';
-  requestAnimationFrame(function(){qt.style.opacity='1'; qt.style.transform='translateY(0)';});
+  setTimeout(function(){qt.style.opacity='1'; qt.style.transform='translateY(0)';},30);
   document.getElementById('prog-label').textContent=(S.i+1)+'/'+t;
   document.getElementById('prog-fill').style.width=pct+'%';
   var dots=document.getElementById('dots'); dots.innerHTML='';
   for(var i=0;i<t;i++){var d=document.createElement('span');d.className='dot';if(S.a[i+1]!==undefined)d.classList.add('done');if(i===S.i)d.classList.add('current');dots.appendChild(d);}
-  var opts=document.getElementById('opts'); opts.innerHTML='';
+  var opts=document.getElementById('opts'); opts.innerHTML=''; opts.classList.remove('opts-disabled');
   var letters=['A','B','C','D'];
   q.options.forEach(function(o,idx){
     var card=document.createElement('div');card.className='option-card fade-in';card.style.animationDelay=(idx*0.06)+'s';
@@ -400,10 +406,10 @@ function pick(id,o){
   for(var k in o.scores){if(o.scores.hasOwnProperty(k)){S.s[k]=(S.s[k]||0)+o.scores[k];}}
   if(S.i<Q.length-1){
     var qt=document.getElementById('q-text'), ol=document.getElementById('opts');
-    ol.style.pointerEvents='none';
+    ol.classList.add('opts-disabled');
     qt.style.opacity='0';qt.style.transform='translateY(-10px)';
     Array.from(ol.children).forEach(function(c,i){c.style.opacity='0';c.style.transform='translateX(-12px)';c.style.transition='all 0.25s ease '+(i*0.04)+'s';});
-    setTimeout(function(){ol.style.pointerEvents='';S.i++;renderQ();},350);
+    setTimeout(function(){S.i++;renderQ();},350);
   }else{finish();}
 }
 
