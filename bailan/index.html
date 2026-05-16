@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SLTI 摆烂人格测试 | MiniTest</title>
+<style>
+:root {
+  --bg: #F5F3F0;
+  --card-bg: #FFFFFF;
+  --text: #2D2A26;
+  --text-dim: #8C8880;
+  --text-light: #B0AAA2;
+  --border: #E8E4DD;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.08);
+  --radius: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --font-display: 'STKaiti', 'KaiTi', '楷体', serif;
+  --font-body: 'Microsoft YaHei', '微软雅黑', 'PingFang SC', sans-serif;
+  --transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+#app { max-width: 560px; margin: 0 auto; min-height: 100vh; position: relative; }
+.page { display: none; min-height: 100vh; padding: 40px 24px; flex-direction: column; align-items: center; opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.page.active { display: flex; opacity: 1; transform: translateY(0); }
+.bg-pattern {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 0; opacity: 0.35;
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(124, 156, 211, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 85% 60%, rgba(239, 181, 128, 0.10) 0%, transparent 50%),
+    radial-gradient(circle at 50% 85%, rgba(147, 197, 166, 0.08) 0%, transparent 50%);
+}
+.back-link { color: var(--text-dim); font-size: 0.85rem; text-decoration: none; transition: color var(--transition); }
+.back-link:hover { color: #5B6FA0; }
+.back-row { width: 100%; display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; z-index: 1; }
+
+/* HOME */
+.home-container { z-index: 1; width: 100%; }
+.home-hero { text-align: center; padding: 32px 0 24px; }
+.home-illustration {
+  width: 140px; height: 140px; border-radius: 50%;
+  background: linear-gradient(135deg, #F0ECE5, #E8E4DD);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 20px; box-shadow: var(--shadow-md); position: relative; overflow: hidden;
+}
+.home-illustration::after { content: ''; position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); width: 100px; height: 40px; background: rgba(124, 156, 211, 0.08); border-radius: 50%; }
+.home-illo-emoji { font-size: 3.8rem; position: relative; z-index: 1; animation: float 3s ease-in-out infinite; }
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.home-badge { display: inline-block; font-size: 0.7rem; letter-spacing: 0.3em; color: #5B6FA0; background: rgba(91, 111, 160, 0.08); padding: 5px 18px; border-radius: 50px; margin-bottom: 14px; }
+.home-title { font-family: var(--font-display); font-size: 1.8rem; color: var(--text); line-height: 1.45; margin-bottom: 6px; letter-spacing: 0.03em; }
+.home-title span { color: #5B6FA0; }
+.home-subtitle { font-size: 0.88rem; color: var(--text-dim); letter-spacing: 0.05em; margin-bottom: 24px; }
+
+.stats-row { display: flex; justify-content: center; gap: 12px; margin-bottom: 32px; flex-wrap: wrap; }
+.stat-pill { background: var(--card-bg); border: 1px solid var(--border); border-radius: 50px; padding: 8px 16px; font-size: 0.73rem; color: var(--text-dim); letter-spacing: 0.04em; box-shadow: var(--shadow-sm); white-space: nowrap; }
+.stat-pill b { color: var(--text); font-weight: 700; }
+
+.section-title { font-size: 1rem; font-family: var(--font-display); color: var(--text); margin-bottom: 14px; letter-spacing: 0.05em; text-align: center; }
+.section-sub { font-size: 0.78rem; color: var(--text-light); margin-bottom: 18px; text-align: center; letter-spacing: 0.06em; }
+
+.dim-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 28px; }
+.dim-explainer { background: var(--card-bg); border-radius: var(--radius-lg); padding: 18px 16px; box-shadow: var(--shadow-sm); text-align: left; }
+.dim-explainer-icon { font-size: 1.3rem; margin-bottom: 6px; }
+.dim-explainer-label { font-size: 0.7rem; color: var(--text-light); letter-spacing: 0.1em; margin-bottom: 4px; }
+.dim-explainer-name { font-size: 0.88rem; font-weight: 700; color: var(--text); letter-spacing: 0.03em; }
+.dim-explainer-desc { font-size: 0.72rem; color: var(--text-dim); margin-top: 4px; line-height: 1.5; }
+
+.preview-row { display: flex; gap: 10px; margin-bottom: 28px; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+.preview-card { flex: 0 0 110px; background: var(--card-bg); border-radius: var(--radius-lg); padding: 16px 10px 14px; text-align: center; box-shadow: var(--shadow-sm); cursor: default; }
+.preview-card-emoji { font-size: 2rem; margin-bottom: 6px; }
+.preview-card-name { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.03em; margin-bottom: 2px; }
+.preview-card-code { font-size: 0.62rem; color: var(--text-light); letter-spacing: 0.1em; }
+
+.faq-section { margin-bottom: 28px; }
+.faq-item { background: var(--card-bg); border-radius: var(--radius-lg); padding: 18px 20px; margin-bottom: 8px; box-shadow: var(--shadow-sm); text-align: left; }
+.faq-q { font-size: 0.82rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.faq-a { font-size: 0.78rem; color: var(--text-dim); line-height: 1.6; }
+
+.cta-wrap { text-align: center; padding-bottom: 40px; }
+
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 16px 48px;
+  background: linear-gradient(135deg, #5B6FA0, #4A5C8A);
+  color: #fff; border: none; border-radius: 50px;
+  font-family: var(--font-display); font-size: 1.1rem; letter-spacing: 0.1em;
+  cursor: pointer; transition: all var(--transition);
+  box-shadow: 0 4px 20px rgba(91, 111, 160, 0.25); text-decoration: none;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(91, 111, 160, 0.35); }
+.btn-primary:active { transform: scale(0.97); }
+
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 28px; background: var(--card-bg); color: var(--text-dim);
+  border: 1.5px solid var(--border); border-radius: 50px;
+  font-family: var(--font-display); font-size: 0.95rem; letter-spacing: 0.06em;
+  cursor: pointer; transition: all var(--transition); text-decoration: none;
+  box-shadow: var(--shadow-sm);
+}
+.btn-secondary:hover { border-color: #5B6FA0; color: #5B6FA0; box-shadow: var(--shadow-md); }
+
+/* QUIZ */
+.quiz-container { z-index: 1; width: 100%; display: flex; flex-direction: column; flex: 1; }
+.progress-bar { width: 100%; height: 4px; background: var(--border); border-radius: 2px; margin-bottom: 32px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #5B6FA0, #7C9CD3); border-radius: 2px; transition: width 0.5s ease; }
+.progress-num { font-size: 0.78rem; color: var(--text-dim); letter-spacing: 0.08em; }
+.quiz-dots { display: flex; gap: 8px; justify-content: center; margin-bottom: 28px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); transition: all var(--transition); }
+.dot.done { background: #5B6FA0; }
+.dot.current { background: #7C9CD3; box-shadow: 0 0 8px rgba(91, 111, 160, 0.4); transform: scale(1.5); }
+.question-card { background: var(--card-bg); border-radius: var(--radius-lg); padding: 24px 22px; margin-bottom: 20px; box-shadow: var(--shadow-md); text-align: center; }
+.question-card::before { content: ''; display: block; width: 36px; height: 3px; background: linear-gradient(90deg, #5B6FA0, #7C9CD3); border-radius: 2px; margin: 0 auto 14px; }
+.question-text { font-family: var(--font-display); font-size: 1.2rem; color: var(--text); line-height: 1.7; transition: opacity 0.3s ease; }
+.options-list { display: flex; flex-direction: column; gap: 9px; width: 100%; }
+.option-card { display: flex; align-items: center; gap: 14px; padding: 15px 18px; background: var(--card-bg); border: 1.5px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all var(--transition); box-shadow: var(--shadow-sm); }
+.option-card:hover { border-color: #7C9CD3; box-shadow: var(--shadow-md); transform: translateX(3px); }
+.option-card:active { transform: scale(0.985); }
+.option-letter { flex-shrink: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: rgba(91, 111, 160, 0.06); border-radius: 50%; font-family: var(--font-display); font-size: 0.78rem; color: #5B6FA0; font-weight: 700; transition: all var(--transition); }
+.option-card:hover .option-letter { background: #5B6FA0; color: #fff; }
+.option-text { font-size: 0.9rem; color: var(--text); line-height: 1.5; }
+
+/* RESULT */
+.result-container { z-index: 1; width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.result-type-badge { font-size: 0.78rem; color: var(--text-dim); letter-spacing: 0.15em; margin-bottom: 14px; }
+.result-hero { width: 110px; height: 110px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; box-shadow: var(--shadow-lg); animation: float 3s ease-in-out infinite; }
+.result-hero-emoji { font-size: 3rem; }
+.result-type-code { font-size: 1.3rem; letter-spacing: 0.25em; margin-bottom: 4px; font-weight: 800; }
+.result-name { font-family: var(--font-display); font-size: 2.2rem; margin-bottom: 4px; letter-spacing: 0.04em; }
+.result-tagline { font-size: 0.85rem; color: var(--text-dim); font-style: italic; margin-bottom: 24px; max-width: 360px; line-height: 1.6; }
+
+.dim-section { width: 100%; margin-bottom: 16px; }
+.dim-section-title { font-size: 0.7rem; color: var(--text-light); letter-spacing: 0.18em; margin-bottom: 10px; text-align: center; }
+.dim-card { background: var(--card-bg); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 5px; box-shadow: var(--shadow-sm); text-align: left; }
+.dim-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.dim-card-label { font-size: 0.73rem; color: var(--text-dim); letter-spacing: 0.05em; }
+.dim-card-letter { font-size: 0.8rem; font-weight: 800; letter-spacing: 0.1em; }
+.dim-bar-bg { height: 5px; background: #F0ECE5; border-radius: 3px; overflow: hidden; }
+.dim-bar-fill { height: 100%; border-radius: 3px; transition: width 1.2s ease; }
+
+.traits-card { background: var(--card-bg); border-radius: var(--radius-lg); padding: 16px 20px; margin-bottom: 16px; width: 100%; box-shadow: var(--shadow-sm); }
+.traits-card-title { font-size: 0.7rem; color: var(--text-light); letter-spacing: 0.18em; margin-bottom: 10px; }
+.traits-list { display: flex; flex-wrap: wrap; gap: 7px; justify-content: center; }
+.trait-tag { padding: 5px 13px; border-radius: 50px; font-size: 0.8rem; letter-spacing: 0.03em; font-weight: 500; }
+
+.desc-card { background: var(--card-bg); border-radius: var(--radius-lg); padding: 18px 22px; margin-bottom: 20px; width: 100%; box-shadow: var(--shadow-sm); text-align: left; }
+.desc-card::before { content: '\01F4AC'; display: block; font-size: 1.1rem; margin-bottom: 8px; }
+.desc-text { font-size: 0.84rem; color: var(--text-dim); line-height: 1.75; }
+
+.gallery-section { width: 100%; margin-bottom: 24px; }
+.gallery-title { font-size: 0.7rem; color: var(--text-light); letter-spacing: 0.18em; margin-bottom: 12px; text-align: center; }
+.gallery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.gallery-card { background: var(--card-bg); border-radius: var(--radius); padding: 14px 12px; box-shadow: var(--shadow-sm); text-align: center; transition: all var(--transition); cursor: pointer; border: 1.5px solid transparent; }
+.gallery-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.gallery-card.active { border-color: #5B6FA0; }
+.gallery-emoji { font-size: 1.8rem; margin-bottom: 4px; }
+.gallery-name { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.03em; }
+.gallery-code { font-size: 0.62rem; color: var(--text-light); letter-spacing: 0.08em; margin-top: 1px; }
+
+.result-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 32px; }
+.result-actions .btn-primary { background: linear-gradient(135deg, #5B6FA0, #4A5C8A); }
+
+.fade-in { animation: fadeIn 0.8s ease forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+.d1 { animation-delay: 0.1s; } .d2 { animation-delay: 0.2s; } .d3 { animation-delay: 0.3s; } .d4 { animation-delay: 0.4s; } .d5 { animation-delay: 0.5s; } .d6 { animation-delay: 0.6s; } .d7 { animation-delay: 0.7s; }
+
+@media (max-width: 640px) {
+  .home-title { font-size: 1.5rem; }
+  .home-illustration { width: 120px; height: 120px; }
+  .home-illo-emoji { font-size: 3.2rem; }
+  .question-text { font-size: 1.05rem; }
+  .result-name { font-size: 1.8rem; }
+  .option-card { padding: 13px 15px; }
+  .question-card { padding: 20px 16px; }
+  .dim-cards { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .gallery-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="bg-pattern"></div>
+
+<div id="app">
+
+<div class="page active" id="page-home">
+  <div class="home-container">
+    <div class="home-hero">
+      <div class="home-illustration fade-in"><div class="home-illo-emoji">🦥</div></div>
+      <div class="home-badge fade-in d1">SLTI 人格测评</div>
+      <h1 class="home-title fade-in d2">你的<span>摆烂人格</span><br>是什么类型？</h1>
+      <p class="home-subtitle fade-in d3">基于 MBTI 框架 × 职场摸鱼行为学</p>
+    </div>
+
+    <div class="stats-row fade-in d3">
+      <span class="stat-pill"><b>8</b> 种人格</span>
+      <span class="stat-pill"><b>4</b> 大维度</span>
+      <span class="stat-pill"><b>10</b> 道趣味题</span>
+      <span class="stat-pill"><b>2</b> 分钟完成</span>
+    </div>
+
+    <div class="cta-wrap fade-in d4">
+      <button class="btn-primary" onclick="startQuiz()">开始测试 →</button>
+    </div>
+
+    <div class="section-title fade-in d4">测试看点</div>
+    <div class="section-sub fade-in d4">SLTI 从四个维度刻画你的摆烂人格，比 MBTI 更懂打工人的精神状态</div>
+    <div class="dim-cards fade-in d5">
+      <div class="dim-explainer"><div class="dim-explainer-icon">🎭</div><div class="dim-explainer-label">O / H</div><div class="dim-explainer-name">摸鱼姿态</div><div class="dim-explainer-desc">光明正大摸，还是偷偷摸摸摸？</div></div>
+      <div class="dim-explainer"><div class="dim-explainer-icon">🧠</div><div class="dim-explainer-label">T / E</div><div class="dim-explainer-name">摆烂驱动</div><div class="dim-explainer-desc">精心计算的理性，还是情绪崩溃的感性？</div></div>
+      <div class="dim-explainer"><div class="dim-explainer-icon">⏱</div><div class="dim-explainer-label">B / S</div><div class="dim-explainer-name">节奏模式</div><div class="dim-explainer-desc">间歇性爆发冲刺，还是细水长流的均匀摆烂？</div></div>
+      <div class="dim-explainer"><div class="dim-explainer-icon">🔮</div><div class="dim-explainer-label">L / R</div><div class="dim-explainer-name">终极信仰</div><div class="dim-explainer-desc">躺平到底绝不回头，还是暗中积蓄卷土重来？</div></div>
+    </div>
+
+    <div class="section-title fade-in d5">人格一览</div>
+    <div class="section-sub fade-in d5">八种摆烂人格，你属于哪一种？</div>
+    <div class="preview-row fade-in d6" id="preview-row"></div>
+
+    <div class="faq-section fade-in d6">
+      <div class="section-title" style="margin-bottom:12px">常见问题</div>
+      <div class="faq-item">
+        <div class="faq-q">SLTI 是什么？</div>
+        <div class="faq-a">SLTI（Silly Labor Type Indicator）是一个轻松向的职场人格测试。它不从正经角度定义你，而是从摸鱼姿态、摆烂动机、工作节奏和终极信仰这四个维度，帮你发现自己在职场中的真实一面。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">SLTI 和 MBTI 有什么区别？</div>
+        <div class="faq-a">MBTI 是经典的人格分类工具，偏正经心理学。SLTI 则更贴近打工人的日常精神状态——测的不是你"是谁"，而是"你怎么摸"。结果更轻松、更会心一笑。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">测完能看到什么？</div>
+        <div class="faq-a">你会拿到专属的 SLTI 四字母代码、人格名称、四维落点图、性格特质标签和详细解读。还能查看全部 8 种人格类型，看看你的同事朋友是哪一种。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-quiz">
+  <div class="quiz-container">
+    <div class="back-row">
+      <a href="../" class="back-link">← 首页</a>
+      <span class="progress-num" id="prog-label">1/10</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:10%"></div></div>
+    <div class="quiz-dots" id="dots"></div>
+    <div class="question-card"><div class="question-text" id="q-text"></div></div>
+    <div class="options-list" id="opts"></div>
+  </div>
+</div>
+
+<div class="page" id="page-result">
+  <div class="result-container" id="result-content"></div>
+</div>
+
+</div>
+
+<script>
+var T = [
+  { code:'HTBS',name:'战术狐狸',emoji:'🦊',color:'#E8824A',colorLight:'#FDF0E8',tagline:'一切摸鱼都在 Excel 里算过 ROI',traits:['理性计算','精准摸鱼','收益至上','职场数学家'],desc:'你是职场中的精算师。每一次摸鱼背后都有严密的成本收益分析，你的 PRD 里甚至包含一份"不可见摸鱼时间预算表"。别人以为你在偷懒，其实你在优化投入产出比。' },
+  { code:'OTBL',name:'彻底树懒',emoji:'🦥',color:'#6DA88A',colorLight:'#EDF5F1',tagline:'我的职业规划就是没有规划',traits:['坦荡摆烂','绝不内耗','活在当下','快乐优先'],desc:'你是摆烂流派的开山祖师。从不掩饰、从不解释、从不动摇。你对 KPI 的态度就像对天气——无法改变就不去想。你的松弛感让卷王们既羡慕又愤怒。' },
+  { code:'HESR',name:'社畜乌龟',emoji:'🐢',color:'#7C8BB8',colorLight:'#EDEFF6',tagline:'想摆不敢摆，边骂边干到凌晨',traits:['表面努力','内心崩溃','偷偷摸鱼','循环内耗'],desc:'你是职场中最矛盾的存在。嘴上喊着摆烂，手上比谁都卷。你会在深夜加班时发一条"好想辞职"的朋友圈，然后设成仅自己可见。你需要一次真正的释放。' },
+  { code:'OEBS',name:'摸鱼章鱼',emoji:'🐙',color:'#D47A8C',colorLight:'#FCF1F3',tagline:'八只手同时摸，周报还能写三页',traits:['多线并行','效率奇高','深藏不露','生存大师'],desc:'你是职场生存的终极形态。同时摸鱼、开会、回消息、写周报，还能在站会上用三个数据点让老板点头。你不是在摸鱼，你是在用 20% 的时间完成 80% 的工作，剩下 80% 的时间和同事聊八卦。' },
+  { code:'HTBR',name:'哲思猫头鹰',emoji:'🦉',color:'#9B7EC4',colorLight:'#F5F1FA',tagline:'我能论证所有会议都是无效的，但我会准时参加',traits:['洞察本质','理性批判','嘴上摆烂','行动靠谱'],desc:'你是职场中的哲学家。你能从组织架构、信息熵和博弈论角度论证为什么周五下午开会是反人类的，但你依然会带着笔记准时出现。你的摆烂是形而上的——身在工作，心已出家。' },
+  { code:'OESL',name:'佛系熊猫',emoji:'🐼',color:'#5C9EAD',colorLight:'#EFF6F7',tagline:'需求能不能做？随缘吧',traits:['心态平和','与世无争','顺其自然','情绪稳定'],desc:'你是职场中的修行者。被砍需求？阿弥陀佛。被甩锅？善哉善哉。加班？缘分未到。你从不主动摆烂，只是对一切结果都报以微笑。同事们怀疑你是不是已经财务自由了。' },
+  { code:'HTSL',name:'暗中猫咪',emoji:'🐱',color:'#E8A858',colorLight:'#FDF6EC',tagline:'你以为我在写文档，其实我在刷小红书',traits:['伪装大师','演技在线','秘密摸鱼','精准伪装'],desc:'你拥有顶级的职场伪装术。你的屏幕永远排列着三份文档和五个 Excel，但没人知道其中四个窗口下面藏着微博、小红书和炒股软件。你的 Alt+Tab 手速已经达到职业电竞水平。' },
+  { code:'OTBR',name:'觉醒雄鹰',emoji:'🦅',color:'#C4635A',colorLight:'#FCF0EF',tagline:'看透职场本质，正在谋划个人事业',traits:['洞察力强','行动力猛','目标清晰','不破不立'],desc:'你不是在摆烂，你是在积蓄力量。你早已看透职场的荒诞与天花板，正把摸鱼的时间全部投入个人成长。当别人还在纠结要不要离职时，你的副业已经月入五位数。你不是摆烂，你是战略撤退。' }
+];
+
+var Q = [
+  { id:1,question:'领导不在工位时，你的第一反应是？',options:[
+    { id:'A',text:'立刻开始光明正大摸鱼，屏幕都不用切',scores:{O:3,T:1}},
+    { id:'B',text:'先观察周围有没有领导的眼线，再决定摸不摸',scores:{H:3,T:2}},
+    { id:'C',text:'该干嘛干嘛，领导在与不在区别不大',scores:{O:1,H:1,S:2}},
+    { id:'D',text:'趁机打开招聘软件投简历',scores:{H:2,R:3}}
+  ]},
+  { id:2,question:'你摆烂的核心原因是什么？',options:[
+    { id:'A',text:'算过了，拼命干的 ROI 太低，不如摆',scores:{T:4}},
+    { id:'B',text:'情绪撑不住了，身体先投降的',scores:{E:3,L:1}},
+    { id:'C',text:'就是单纯不想努力，没有为什么',scores:{E:1,L:3}},
+    { id:'D',text:'摆烂是为了下一波冲刺蓄力',scores:{T:1,R:3}}
+  ]},
+  { id:3,question:'你的摸鱼节奏更像哪种？',options:[
+    { id:'A',text:'周一摆到周五上午，周五下午爆发式冲刺',scores:{B:4}},
+    { id:'B',text:'每天均匀分布摸鱼时间，像呼吸一样自然',scores:{S:4}},
+    { id:'C',text:'随机模式，看心情和当天的咖啡浓度',scores:{S:1,B:1,E:2}},
+    { id:'D',text:'根本不摸鱼，只是工作效率比别人高三倍',scores:{B:1,T:2,R:1}}
+  ]},
+  { id:4,question:'你对自己未来的真实想法是？',options:[
+    { id:'A',text:'躺平到底，给我一张床我能躺到退休',scores:{L:4}},
+    { id:'B',text:'现在摆烂只是暂时的，总有一天我会卷土重来',scores:{R:4}},
+    { id:'C',text:'先摸清楚自己想要什么再动，不急',scores:{L:1,R:1,T:2}},
+    { id:'D',text:'已经在悄咪咪准备副业 / 跳槽了',scores:{R:2,H:2}}
+  ]},
+  { id:5,question:'站会上被 cue 到进度，你的回答属于？',options:[
+    { id:'A',text:'"还在调研阶段，下周会有明确产出"（其实还没开始）',scores:{H:3,T:2}},
+    { id:'B',text:'"做完了，但发现一个更好的方案，正在优化"（其实只做了一半）',scores:{O:2,T:2,B:1}},
+    { id:'C',text:'实话实说，摆烂也要摆得坦荡',scores:{O:4}},
+    { id:'D',text:'"遇到了一些技术难题，正在和开发对齐"（万能话术）',scores:{H:2,S:2,B:1}}
+  ]},
+  { id:6,question:'同事约你一起摸鱼，你会？',options:[
+    { id:'A',text:'欣然加入，摸鱼就是要众乐乐',scores:{O:3,S:1}},
+    { id:'B',text:'婉拒，独自摸鱼效率更高，不容易被发现',scores:{H:3,T:1}},
+    { id:'C',text:'答应但换个隐蔽位置，万一被发现只有同事倒霉',scores:{H:2,T:3}},
+    { id:'D',text:'不摸鱼，你是来带薪学习的',scores:{R:3,S:1}}
+  ]},
+  { id:7,question:'周五下午四点，突然来了个紧急需求，你？',options:[
+    { id:'A',text:'内心崩溃，嘴里答应，然后破罐破摔做得很烂',scores:{E:4}},
+    { id:'B',text:'评估一下要多久，如果超过一小时就推到下周一',scores:{T:3,S:1}},
+    { id:'C',text:'飞速搞定，不想让这破事影响周末心情',scores:{B:3,T:1}},
+    { id:'D',text:'"好的收到"——然后假装没看到，周一再说',scores:{H:2,L:2,S:2}}
+  ]},
+  { id:8,question:'你最近一次认真干活是什么时候？',options:[
+    { id:'A',text:'昨天，我是间歇性爆发型选手',scores:{B:4}},
+    { id:'B',text:'每天都有认真干，只是效率时高时低',scores:{S:3,T:1}},
+    { id:'C',text:'想不起来了，可能是上次绩效考核前',scores:{L:3,E:1}},
+    { id:'D',text:'我一直在认真干活——只是我的标准和老板不一样',scores:{O:2,R:2}}
+  ]},
+  { id:9,question:'你觉得职场的尽头是什么？',options:[
+    { id:'A',text:'一场大型的无效协作实验',scores:{T:2,L:2}},
+    { id:'B',text:'用有限的生命换取有限的金钱，然后寻找无限的意义',scores:{R:3,E:1}},
+    { id:'C',text:'一群聪明人假装忙碌的行为艺术',scores:{O:2,L:1,T:1}},
+    { id:'D',text:'没关系，我反正是要逃出去的',scores:{R:4}}
+  ]},
+  { id:10,question:'假如明天就被优化了，你的心态是？',options:[
+    { id:'A',text:'终于解脱了，领完补偿金先去西藏躺一个月',scores:{L:3,O:1}},
+    { id:'B',text:'早有准备，副业/人脉/下家全都安排好了',scores:{R:4}},
+    { id:'C',text:'虽然难受但很快接受，反正这公司早该优化我了',scores:{E:2,L:1,T:1}},
+    { id:'D',text:'立刻打开 Boss 直聘，开始精确计算下一份工作的性价比',scores:{T:4}}
+  ]}
+];
+
+var S = { i:0,a:{},s:{O:0,H:0,T:0,E:0,B:0,S:0,L:0,R:0} };
+
+function go(p) {
+  document.querySelectorAll('.page').forEach(function(x){x.classList.remove('active');});
+  document.getElementById('page-'+p).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function startQuiz() {
+  S = { i:0,a:{},s:{O:0,H:0,T:0,E:0,B:0,S:0,L:0,R:0} };
+  go('quiz'); renderQ();
+}
+
+function renderQ() {
+  var q=Q[S.i], t=Q.length, pct=((S.i+1)/t)*100;
+  var qt=document.getElementById('q-text'); qt.textContent=q.question;
+  qt.style.opacity='0'; qt.style.transform='translateY(10px)';
+  requestAnimationFrame(function(){qt.style.opacity='1'; qt.style.transform='translateY(0)';});
+  document.getElementById('prog-label').textContent=(S.i+1)+'/'+t;
+  document.getElementById('prog-fill').style.width=pct+'%';
+  var dots=document.getElementById('dots'); dots.innerHTML='';
+  for(var i=0;i<t;i++){var d=document.createElement('span');d.className='dot';if(S.a[i+1]!==undefined)d.classList.add('done');if(i===S.i)d.classList.add('current');dots.appendChild(d);}
+  var opts=document.getElementById('opts'); opts.innerHTML='';
+  var letters=['A','B','C','D'];
+  q.options.forEach(function(o,idx){
+    var card=document.createElement('div');card.className='option-card fade-in';card.style.animationDelay=(idx*0.06)+'s';
+    var l=document.createElement('span');l.className='option-letter';l.textContent=letters[idx];
+    var tx=document.createElement('span');tx.className='option-text';tx.textContent=o.text;
+    card.appendChild(l);card.appendChild(tx);
+    card.addEventListener('click',function(){pick(q.id,o);});
+    opts.appendChild(card);
+  });
+}
+
+function pick(id,o){
+  S.a[id]=o.id;
+  for(var k in o.scores){if(o.scores.hasOwnProperty(k)){S.s[k]=(S.s[k]||0)+o.scores[k];}}
+  if(S.i<Q.length-1){
+    var qt=document.getElementById('q-text'), ol=document.getElementById('opts');
+    qt.style.opacity='0';qt.style.transform='translateY(-10px)';
+    Array.from(ol.children).forEach(function(c,i){c.style.opacity='0';c.style.transform='translateX(-12px)';c.style.transition='all 0.25s ease '+(i*0.04)+'s';});
+    setTimeout(function(){S.i++;renderQ();},350);
+  }else{finish();}
+}
+
+function finish(){
+  var dims={O_H:S.s.O>S.s.H?'O':'H',T_E:S.s.T>S.s.E?'T':'E',B_S:S.s.B>S.s.S?'B':'S',L_R:S.s.L>S.s.R?'L':'R'};
+  var code=dims.O_H+dims.T_E+dims.B_S+dims.L_R;
+  var m=T.find(function(x){return x.code===code;})||T[0];
+  go('result'); renderR(m,dims);
+}
+
+function renderR(t,dims){
+  var c=document.getElementById('result-content');
+  var dimOrder=[
+    {key:'O_H',lK:'O',lL:'光明正大摸',rK:'H',rL:'偷偷摸摸摸'},
+    {key:'T_E',lK:'T',lL:'理性计算',rK:'E',rL:'情绪驱动'},
+    {key:'B_S',lK:'B',lL:'爆发冲刺',rK:'S',rL:'细水长流'},
+    {key:'L_R',lK:'L',lL:'躺平到底',rK:'R',rL:'卷土重来'}
+  ];
+  var dimsHTML='<div class="dim-section"><div class="dim-section-title fade-in">四维落点</div>';
+  dimOrder.forEach(function(d,di){
+    var val=dims[d.key], total=S.s[d.lK]+S.s[d.rK]+1;
+    var lPct=Math.round(S.s[d.lK]/total*100), rPct=100-lPct;
+    var lA=val===d.lK, rA=val===d.rK;
+    dimsHTML+=
+      '<div class="dim-card fade-in d3" style="animation-delay:'+(0.3+di*0.08)+'s">'+
+        '<div class="dim-card-header"><span class="dim-card-label">'+d.lL+'</span><span class="dim-card-letter" style="color:'+(lA?t.color:'#B0AAA2')+'">'+d.lK+'</span></div>'+
+        '<div class="dim-bar-bg"><div class="dim-bar-fill" style="width:'+lPct+'%;background:'+t.color+'"></div></div>'+
+      '</div>'+
+      '<div class="dim-card fade-in d3" style="animation-delay:'+(0.35+di*0.08)+'s">'+
+        '<div class="dim-card-header"><span class="dim-card-label">'+d.rL+'</span><span class="dim-card-letter" style="color:'+(rA?t.color:'#B0AAA2')+'">'+d.rK+'</span></div>'+
+        '<div class="dim-bar-bg"><div class="dim-bar-fill" style="width:'+rPct+'%;background:'+t.color+'"></div></div>'+
+      '</div>';
+  });
+  dimsHTML+='</div>';
+
+  var galleryHTML='<div class="gallery-section fade-in d6"><div class="gallery-title">查看其他人格类型</div><div class="gallery-grid">';
+  T.forEach(function(x){
+    var isMe=x.code===t.code;
+    galleryHTML+='<div class="gallery-card'+(isMe?' active':'')+'" style="'+(isMe?'border-color:'+x.color:'')+'"><div class="gallery-emoji">'+x.emoji+'</div><div class="gallery-name" style="color:'+x.color+'">'+x.name+'</div><div class="gallery-code">'+x.code+'</div></div>';
+  });
+  galleryHTML+='</div></div>';
+
+  c.innerHTML=
+    '<div class="result-type-badge fade-in">你的 SLTI 类型</div>'+
+    '<div class="result-hero fade-in d1" style="background:'+t.colorLight+'"><div class="result-hero-emoji">'+t.emoji+'</div></div>'+
+    '<div class="result-type-code fade-in d1" style="color:'+t.color+'">'+t.code+'</div>'+
+    '<div class="result-name fade-in d2" style="color:'+t.color+'">'+t.name+'</div>'+
+    '<div class="result-tagline fade-in d2">"'+t.tagline+'"</div>'+
+    dimsHTML+
+    '<div class="traits-card fade-in d4"><div class="traits-card-title">性格特质</div><div class="traits-list">'+t.traits.map(function(x){return '<span class="trait-tag" style="background:'+t.colorLight+';color:'+t.color+'">'+x+'</span>';}).join('')+'</div></div>'+
+    '<div class="desc-card fade-in d5"><div class="desc-text">'+t.desc+'</div></div>'+
+    galleryHTML+
+    '<div class="result-actions fade-in d7">'+
+      '<button class="btn-secondary" onclick="startQuiz()">重新测试</button>'+
+      '<button class="btn-primary" onclick="shareIt(\''+t.code+' '+t.name+'\')">\u{1F4CB} 分享结果</button>'+
+    '</div>';
+}
+
+function shareIt(r){
+  var text='我在 SLTI 摆烂人格测试中测出了「'+r+'」！来测测你是什么→ minitext.top/bailan/';
+  if(navigator.clipboard){navigator.clipboard.writeText(text).then(function(){var btns=document.querySelectorAll('#page-result .btn-primary');var b=btns[btns.length-1];if(b){var o=b.innerHTML;b.innerHTML='\u2713 已复制！';setTimeout(function(){b.innerHTML=o;},2000);}});}
+}
+
+(function(){
+  var r=document.getElementById('preview-row');
+  T.forEach(function(x){
+    var d=document.createElement('div');d.className='preview-card';
+    d.innerHTML='<div class="preview-card-emoji">'+x.emoji+'</div><div class="preview-card-name" style="color:'+x.color+'">'+x.name+'</div><div class="preview-card-code">'+x.code+'</div>';
+    r.appendChild(d);
+  });
+})();
+</script>
+</body>
+</html>
