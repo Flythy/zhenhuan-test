@@ -78,7 +78,8 @@ body {
 .dim-explainer-desc { font-size: 0.72rem; color: var(--text-dim); margin-top: 4px; line-height: 1.5; }
 
 .preview-row { display: flex; gap: 10px; margin-bottom: 28px; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
-.preview-card { flex: 0 0 110px; background: var(--card-bg); border-radius: var(--radius-lg); padding: 16px 10px 14px; text-align: center; box-shadow: var(--shadow-sm); cursor: default; }
+.preview-card { flex: 0 0 110px; background: var(--card-bg); border-radius: var(--radius-lg); padding: 16px 10px 14px; text-align: center; box-shadow: var(--shadow-sm); cursor: pointer; transition: all var(--transition); }
+.preview-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
 .preview-card-emoji { font-size: 2rem; margin-bottom: 6px; }
 .preview-card-name { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.03em; margin-bottom: 2px; }
 .preview-card-code { font-size: 0.62rem; color: var(--text-light); letter-spacing: 0.1em; }
@@ -262,6 +263,15 @@ body {
   <div class="result-container" id="result-content"></div>
 </div>
 
+<div class="page" id="page-detail">
+  <div class="result-container" id="detail-content">
+    <div class="back-row" style="justify-content:flex-start;margin-bottom:20px">
+      <a href="javascript:go('home')" class="back-link">← 返回首页</a>
+    </div>
+    <div id="detail-inner"></div>
+  </div>
+</div>
+
 </div>
 
 <script>
@@ -378,9 +388,10 @@ function pick(id,o){
   for(var k in o.scores){if(o.scores.hasOwnProperty(k)){S.s[k]=(S.s[k]||0)+o.scores[k];}}
   if(S.i<Q.length-1){
     var qt=document.getElementById('q-text'), ol=document.getElementById('opts');
+    ol.style.pointerEvents='none';
     qt.style.opacity='0';qt.style.transform='translateY(-10px)';
     Array.from(ol.children).forEach(function(c,i){c.style.opacity='0';c.style.transform='translateX(-12px)';c.style.transition='all 0.25s ease '+(i*0.04)+'s';});
-    setTimeout(function(){S.i++;renderQ();},350);
+    setTimeout(function(){ol.style.pointerEvents='';S.i++;renderQ();},350);
   }else{finish();}
 }
 
@@ -435,13 +446,47 @@ function renderR(t,dims){
     galleryHTML+
     '<div class="result-actions fade-in d7">'+
       '<button class="btn-secondary" onclick="startQuiz()">重新测试</button>'+
-      '<button class="btn-primary" onclick="shareIt(\''+t.code+' '+t.name+'\')">\u{1F4CB} 分享结果</button>'+
+      '<button class="btn-primary" onclick="shareIt(\''+t.code+' '+t.name+'\')">📋 分享结果</button>'+
     '</div>';
 }
 
 function shareIt(r){
   var text='我在 SLTI 摆烂人格测试中测出了「'+r+'」！来测测你是什么→ minitext.top/bailan/';
-  if(navigator.clipboard){navigator.clipboard.writeText(text).then(function(){var btns=document.querySelectorAll('#page-result .btn-primary');var b=btns[btns.length-1];if(b){var o=b.innerHTML;b.innerHTML='\u2713 已复制！';setTimeout(function(){b.innerHTML=o;},2000);}});}
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){
+      var btns=document.querySelectorAll('#page-result .btn-primary');
+      var b=btns[btns.length-1];
+      if(b){var o=b.innerHTML;b.innerHTML='\u2713 已复制！';setTimeout(function(){b.innerHTML=o;},2000);}
+    }).catch(function(){
+      fallbackCopy(text);
+    });
+  }else{
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text){
+  var ta=document.createElement('textarea');
+  ta.value=text;ta.style.position='fixed';ta.style.left='-9999px';
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');var btns=document.querySelectorAll('#page-result .btn-primary');var b=btns[btns.length-1];if(b){var o=b.innerHTML;b.innerHTML='\u2713 已复制！';setTimeout(function(){b.innerHTML=o;},2000);}}catch(e){alert(text);}
+  document.body.removeChild(ta);
+}
+
+function showDetail(code){
+  var t=T.find(function(x){return x.code===code;});
+  if(!t)return;
+  go('detail');
+  var el=document.getElementById('detail-inner');
+  el.innerHTML=
+    '<div class="result-type-badge fade-in">SLTI 人格档案</div>'+
+    '<div class="result-hero fade-in d1" style="background:'+t.colorLight+'"><div class="result-hero-emoji">'+t.emoji+'</div></div>'+
+    '<div class="result-type-code fade-in d1" style="color:'+t.color+'">'+t.code+'</div>'+
+    '<div class="result-name fade-in d2" style="color:'+t.color+'">'+t.name+'</div>'+
+    '<div class="result-tagline fade-in d2">"'+t.tagline+'"</div>'+
+    '<div class="traits-card fade-in d3"><div class="traits-card-title">性格特质</div><div class="traits-list">'+t.traits.map(function(x){return '<span class="trait-tag" style="background:'+t.colorLight+';color:'+t.color+'">'+x+'</span>';}).join('')+'</div></div>'+
+    '<div class="desc-card fade-in d4"><div class="desc-text">'+t.desc+'</div></div>'+
+    '<div class="result-actions fade-in d5"><button class="btn-primary" onclick="startQuiz()">开始测试 →</button></div>';
 }
 
 (function(){
@@ -449,6 +494,7 @@ function shareIt(r){
   T.forEach(function(x){
     var d=document.createElement('div');d.className='preview-card';
     d.innerHTML='<div class="preview-card-emoji">'+x.emoji+'</div><div class="preview-card-name" style="color:'+x.color+'">'+x.name+'</div><div class="preview-card-code">'+x.code+'</div>';
+    d.addEventListener('click',function(){showDetail(x.code);});
     r.appendChild(d);
   });
 })();
