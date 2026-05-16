@@ -134,6 +134,9 @@ body {
 .opts-disabled .option-card:hover { pointer-events: none; border-color: var(--border); box-shadow: var(--shadow-sm); transform: none; }
 .opts-disabled .option-card:hover .option-letter { background: rgba(91, 111, 160, 0.06); color: #5B6FA0; }
 
+.option-card.selected { border-color: #5B6FA0 !important; background: rgba(91, 111, 160, 0.06) !important; transform: scale(1.02) !important; }
+.option-card.selected .option-letter { background: #5B6FA0 !important; color: #fff !important; }
+
 .option-letter { flex-shrink: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: rgba(91, 111, 160, 0.06); border-radius: 50%; font-family: var(--font-display); font-size: 0.78rem; color: #5B6FA0; font-weight: 700; transition: all var(--transition); }
 .option-card:hover .option-letter { background: #5B6FA0; color: #fff; }
 .option-text { font-size: 0.9rem; color: var(--text); line-height: 1.5; }
@@ -396,21 +399,24 @@ function renderQ() {
     var l=document.createElement('span');l.className='option-letter';l.textContent=letters[idx];
     var tx=document.createElement('span');tx.className='option-text';tx.textContent=o.text;
     card.appendChild(l);card.appendChild(tx);
-    card.addEventListener('click',function(){pick(q.id,o);});
+    card.addEventListener('click',function(e){pick(q.id,o,card);});
     opts.appendChild(card);
   });
 }
 
-function pick(id,o){
+function pick(id,o,card){
   S.a[id]=o.id;
   for(var k in o.scores){if(o.scores.hasOwnProperty(k)){S.s[k]=(S.s[k]||0)+o.scores[k];}}
   if(S.i<Q.length-1){
+    card.classList.add('selected');
     var qt=document.getElementById('q-text'), ol=document.getElementById('opts');
     ol.classList.add('opts-disabled');
-    qt.style.opacity='0';qt.style.transform='translateY(-10px)';
-    Array.from(ol.children).forEach(function(c,i){c.style.opacity='0';c.style.transform='translateX(-12px)';c.style.transition='all 0.25s ease '+(i*0.04)+'s';});
-    setTimeout(function(){S.i++;renderQ();},350);
-  }else{finish();}
+    setTimeout(function(){
+      qt.style.opacity='0';qt.style.transform='translateY(-10px)';
+      Array.from(ol.children).forEach(function(c,i){c.style.opacity='0';c.style.transform='translateX(-12px)';c.style.transition='all 0.25s ease '+(i*0.04)+'s';});
+      setTimeout(function(){S.i++;renderQ();},350);
+    },200);
+  }else{card.classList.add('selected');setTimeout(function(){finish();},250);}
 }
 
 function finish(){
