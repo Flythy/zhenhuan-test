@@ -1,0 +1,2489 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>宠记 PetLog · 萌宠风可交互原型</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFF6EF;
+    --bg2:#FFEEDF;
+    --card:#FFFFFF;
+    --ink:#4A3B32;
+    --text:#8A7B6E;
+    --muted:#B9A99C;
+    --line:#F3E4D6;
+    --line2:#FAF0E6;
+    --primary:#FF8A5C;
+    --primary-600:#FF7043;
+    --primary-soft:#FFE6D8;
+    --primary-tint:#FFF1EA;
+    --pink:#FF6F91;
+    --pink-soft:#FFE1E9;
+    --mint:#3EC9A7;
+    --mint-soft:#E0F6EF;
+    --sky:#5FB3F5;
+    --sky-soft:#E3F0FD;
+    --lav:#9B8AFB;
+    --lav-soft:#EFEAFF;
+    --amber:#FFB020;
+    --amber-soft:#FFF1DA;
+    --danger:#FF6B6B;
+    --danger-soft:#FFE6E6;
+    --success:#3EC9A7;
+    --success-soft:#E0F6EF;
+    --radius:22px;
+    --shadow-sm:0 2px 8px rgba(255,138,92,.07);
+    --shadow-md:0 12px 28px rgba(255,138,92,.16);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  i,em{font-style:normal}
+  html,body{height:100%}
+  body{
+    font-family:'PingFang SC','Microsoft YaHei',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    background:linear-gradient(180deg,#FFEBDD 0%,#FFF6EF 420px);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    padding:34px 20px 60px;
+  }
+  .board{max-width:1120px;margin:0 auto}
+  .board-head{text-align:center;margin-bottom:8px}
+  .board-head h1{font-size:26px;font-weight:800;letter-spacing:.3px}
+  .board-head h1 .hl{color:var(--primary)}
+  .board-head h1 .paw{color:var(--primary);display:inline-block;margin-right:2px}
+  .board-head p{color:var(--text);margin-top:8px;font-size:14px}
+  .hint{text-align:center;font-size:12.5px;color:var(--muted);margin:10px 0 26px}
+  .hint b{color:var(--primary-600);font-weight:700}
+  .stage{display:flex;justify-content:center}
+
+  .ico{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+  .ico.sm{width:17px;height:17px}
+  .ico.lg{width:23px;height:23px}
+  .ico.xs{width:15px;height:15px}
+  .ico.fill{fill:currentColor;stroke:none}
+
+  .phone{position:relative;width:376px;height:780px;border-radius:44px;background:#2A211C;padding:10px;box-shadow:0 40px 80px rgba(74,59,50,.30),0 0 0 1px rgba(0,0,0,.05)}
+  .viewport{position:relative;width:100%;height:100%;border-radius:35px;overflow:hidden;background:var(--bg)}
+
+  .tab-screen{position:absolute;inset:0;display:none;flex-direction:column;background:var(--bg)}
+  .tab-screen.active{display:flex}
+  .statusbar{display:flex;justify-content:space-between;align-items:center;padding:14px 22px 4px;font-size:12px;font-weight:700;color:var(--ink);letter-spacing:.3px;flex-shrink:0}
+  .statusbar .s-ico{display:flex;gap:5px;align-items:center;font-size:11px;color:var(--text)}
+  .header{display:flex;justify-content:space-between;align-items:center;padding:14px 20px 12px;flex-shrink:0}
+  .header .eyebrow{font-size:10.5px;color:var(--muted);letter-spacing:1.4px;text-transform:uppercase;font-weight:700}
+  .header .title{font-size:22px;font-weight:800;margin-top:4px;letter-spacing:.2px}
+  .iconbtn{width:40px;height:40px;border-radius:14px;background:#fff;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--text);position:relative;cursor:pointer;transition:transform .12s ease}
+  .iconbtn:active{transform:scale(.92)}
+  .dot-red{position:absolute;top:9px;right:11px;width:8px;height:8px;border-radius:50%;background:var(--danger);border:1.5px solid #fff}
+  .scroll{flex:1;overflow-y:auto;padding:0 20px 100px;scrollbar-width:none}
+  .scroll::-webkit-scrollbar{display:none}
+
+  .card{background:var(--card);background-image:url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23FF9A6B' fill-opacity='0.06'%3E%3Cpath d='M20 16l1.6 4.2 4.2 1.6-4.2 1.6-1.6 4.2-1.6-4.2-4.2-1.6 4.2-1.6zM60 50l2 5 5 2-5 2-2 5-2-5-5-2 5-2z'/%3E%3Ccircle cx='66' cy='16' r='2.2'/%3E%3Ccircle cx='12' cy='58' r='1.8'/%3E%3Ccircle cx='74' cy='72' r='1.4'/%3E%3C/g%3E%3C/svg%3E");border-radius:24px;border:2px dashed var(--line);padding:16px;box-shadow:none}
+  .btn{border-radius:16px;font-size:14px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;border:none;letter-spacing:.2px;transition:transform .12s ease,box-shadow .12s ease}
+  .btn:active{transform:translateY(1px)}
+  .btn-primary{background:linear-gradient(135deg,#FF9A6B,#FF7448);color:#fff;padding:14px;width:100%;box-shadow:0 12px 24px rgba(255,116,72,.28)}
+  .btn-ghost{background:var(--primary-soft);color:var(--primary-600);padding:8px 12px;font-size:12.5px;border-radius:11px}
+  .btn-line{background:#fff;color:var(--text);border:2px solid var(--line);padding:13px;width:100%;border-radius:16px}
+  .btn-mint{background:linear-gradient(135deg,#4ED0B0,#2FB996);color:#fff;padding:14px;width:100%;box-shadow:0 12px 24px rgba(62,201,167,.28)}
+
+  .section-head{display:flex;justify-content:space-between;align-items:center;margin:22px 4px 11px}
+  .section-head b{font-size:15px;font-weight:800;letter-spacing:.3px;color:var(--ink);font-family:'YouYuan','Yuanti SC','PingFang SC','Microsoft YaHei',sans-serif}
+  .section-head a{font-size:12.5px;color:var(--primary);text-decoration:none;font-weight:700;cursor:pointer}
+
+  .chip{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:100px;background:#fff;border:2px solid var(--line);font-size:12.5px;font-weight:600;color:var(--text);cursor:pointer;white-space:nowrap;transition:.15s}
+  .chip.on{background:var(--primary);border-color:var(--primary);color:#fff}
+  .chiprow{display:flex;gap:8px;overflow-x:auto;margin:0 20px 12px;padding:2px;scrollbar-width:none;flex-shrink:0}
+  .chiprow::-webkit-scrollbar{display:none}
+
+  /* ===== 首页 ===== */
+  .hero{position:relative;border-radius:40px 24px 38px 26px/26px 40px 24px 38px;padding:18px 18px 20px;color:#fff;overflow:hidden;background:linear-gradient(140deg,#FFB27A 0%,#FF8A5C 48%,#FF6F91 100%);box-shadow:5px 7px 0 rgba(122,52,28,.14), inset 0 0 0 2px rgba(255,255,255,.5)}
+  .hero .deco{position:absolute;right:-22px;top:-22px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.14)}
+  .hero .deco2{position:absolute;right:22px;bottom:-30px;width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,.10)}
+  .hero-top{display:flex;justify-content:space-between;align-items:center;gap:10px;position:relative;z-index:2}
+  .hero-txt{flex:1;min-width:0}
+  .hero-mascot{width:104px;height:104px;flex-shrink:0;background:#fff;border:3px solid #fff;border-radius:255px 18px 240px 20px/20px 240px 18px 255px;overflow:hidden;box-shadow:0 8px 18px rgba(0,0,0,.18);transform:rotate(4deg);cursor:pointer;position:relative}
+  .hero-mascot .cam{position:absolute;right:6px;bottom:6px;width:22px;height:22px;border-radius:8px;background:rgba(0,0,0,.42);color:#fff;display:flex;align-items:center;justify-content:center}
+  .hero-mascot .cam .ico{width:12px;height:12px}
+  .hero-mascot img{width:100%;height:100%;object-fit:cover;display:block}
+  .hero-hi{font-size:13px;font-weight:600;opacity:.92}
+  .hero-name{position:relative;font-family:'ZCOOL KuaiLe','YouYuan','Yuanti SC','PingFang SC',sans-serif;font-size:19px;font-weight:400;margin-top:4px;line-height:1.32;white-space:normal;word-break:break-word;letter-spacing:.6px}
+  .hero-btn{width:38px;height:38px;border-radius:13px;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;z-index:2}
+  .hero-btn .dot-red{border-color:transparent}
+  .hero-actions{display:flex;gap:9px;margin-top:14px;position:relative;z-index:2}
+  .hero-actions .ha{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);border-radius:14px;padding:10px 8px;font-size:12px;font-weight:700;cursor:pointer}
+  .hero-actions .ha .sp{width:22px;height:22px;border-radius:8px;background:#fff;color:var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .hero-actions .ha.alt .sp{color:var(--lav)}
+  .hero-actions .ha .ico{width:14px;height:14px}
+  .hero-float{position:absolute;z-index:1;color:rgba(255,255,255,.45);pointer-events:none;animation:bob 3.4s ease-in-out infinite}
+  .hero-float.f1{top:auto;left:auto;bottom:12px;right:15px;transform:rotate(-18deg)}
+  .hero-float.f2{right:86px;bottom:48px;transform:rotate(12deg);animation-delay:.9s}
+  .hero-float .ico{width:26px;height:26px}
+  @keyframes bob{0%,100%{translate:0 0}50%{translate:0 -6px}}
+
+  .scan-card{background:#fff;border:2.5px dashed var(--line);border-radius:20px;padding:30px 16px;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--text);margin-bottom:2px}
+  .scan-card .ico{width:34px;height:34px;color:var(--mint)}
+  .scan-card b{font-size:14px;color:var(--ink)}
+  .scan-card span{font-size:12px;color:var(--muted)}
+
+  .voice-hero{background:linear-gradient(135deg,#7C6CF0,#5B8CFF);border-radius:22px;padding:28px 18px;color:#fff;display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:2px}
+  .voice-ring{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+  .voice-ring .ico{width:34px;height:34px}
+  .voice-wave{display:flex;align-items:center;gap:5px;height:26px;margin-bottom:12px}
+  .voice-wave i{width:5px;height:14px;border-radius:99px;background:#fff;animation:blink 1.1s infinite}
+  .voice-wave i:nth-child(2){height:22px;animation-delay:.15s}
+  .voice-wave i:nth-child(3){height:26px;animation-delay:.3s}
+  .voice-wave i:nth-child(4){height:20px;animation-delay:.45s}
+  .voice-wave i:nth-child(5){height:12px;animation-delay:.6s}
+  .voice-hero b{font-size:16px;font-weight:800}
+  .voice-hero span{font-size:12px;opacity:.92;margin-top:5px}
+
+  .stat-row{display:flex;gap:11px;margin-bottom:2px}
+  .stat{flex:1;background:#fff;border:2px solid var(--line);border-radius:18px;padding:14px 6px;display:flex;flex-direction:column;align-items:center;gap:3px}
+  .stat b{font-size:20px;font-weight:800;color:var(--ink)}
+  .stat span{font-size:11px;color:var(--muted)}
+
+  .quick{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-top:14px}
+  .quick .cell{background:#fff;background-image:url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23FF9A6B' fill-opacity='0.06'%3E%3Cpath d='M10 8l1 2.6 2.6 1-2.6 1-1 2.6-1-2.6-2.6-1 2.6-1zM30 26l1.2 3 3 1.2-3 1.2-1.2 3-1.2-3-3-1.2 3-1.2z'/%3E%3Ccircle cx='30' cy='10' r='1.6'/%3E%3Ccircle cx='8' cy='32' r='1.2'/%3E%3C/g%3E%3C/svg%3E");border:2px dashed var(--line);border-radius:20px;padding:14px 4px 12px;display:flex;flex-direction:column;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--text);cursor:pointer;transition:transform .12s ease,box-shadow .12s ease}
+  .quick .cell:active{transform:scale(.94)}
+  .quick .cell .ic{width:44px;height:44px;border-radius:15px;display:flex;align-items:center;justify-content:center}
+  .quick .cell .ic.coral{background:var(--primary-soft);color:var(--primary)}
+  .quick .cell .ic.pink{background:var(--pink-soft);color:var(--pink)}
+  .quick .cell .ic.mint{background:var(--mint-soft);color:var(--mint)}
+  .quick .cell .ic.sky{background:var(--sky-soft);color:var(--sky)}
+  .quick .cell .ic.lav{background:var(--lav-soft);color:var(--lav)}
+  .quick .cell .ic.amber{background:var(--amber-soft);color:var(--amber)}
+
+  .todo-card{display:flex;align-items:center;gap:12px}
+  .todo-ico{width:44px;height:44px;border-radius:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .todo-ico.danger{background:var(--danger-soft);color:var(--danger)}
+  .todo-ico.amber{background:var(--amber-soft);color:var(--amber)}
+  .todo-ico.mint{background:var(--mint-soft);color:var(--mint)}
+  .todo-body{flex:1;min-width:0}
+  .todo-body b{font-size:14px;font-weight:800}
+  .todo-body span{font-size:11.5px;color:var(--muted);margin-top:2px;display:block}
+
+  /* ===== 记录 ===== */
+  .t-entry{display:flex;align-items:center;gap:12px;padding:14px 14px;background:#fff;border:2px solid var(--line);border-radius:18px;margin-bottom:10px;cursor:pointer;transition:transform .12s ease}
+  .t-entry:active{transform:scale(.98)}
+  .t-ico{width:42px;height:42px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .t-ico.amber{background:var(--amber-soft);color:var(--amber)}
+  .t-ico.blue{background:var(--sky-soft);color:var(--sky)}
+  .t-ico.teal{background:var(--mint-soft);color:var(--mint)}
+  .t-ico.slate{background:#F1F0F4;color:#9a94a8}
+  .t-ico.pink{background:var(--pink-soft);color:var(--pink)}
+  .t-ico.coral{background:var(--primary-soft);color:var(--primary)}
+  .t-ico.violet{background:var(--lav-soft);color:var(--lav)}
+  .t-body{flex:1;min-width:0}
+  .t-body b{font-size:14px;font-weight:800;display:block}
+  .t-body span{font-size:11.5px;color:var(--muted);margin-top:2px;display:block}
+  .chev{color:var(--muted)}
+
+  .fab{position:absolute;right:20px;bottom:88px;width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#FF9A6B,#FF7448);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 14px 28px rgba(255,116,72,.32),inset 0 -3px 0 rgba(0,0,0,.08);cursor:pointer;z-index:5;transition:transform .12s ease}
+  .fab:active{transform:scale(.92)}
+
+  /* ===== 提醒 ===== */
+  .ai-banner{display:flex;align-items:center;gap:11px;background:linear-gradient(135deg,#F3EEFF,#EDE8FF);border:2px solid var(--lav-soft);border-radius:18px;padding:13px 14px;margin-bottom:14px;cursor:pointer}
+  .ai-banner .ai-ic{width:40px;height:40px;border-radius:13px;background:var(--lav);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .ai-banner .b-body{flex:1}
+  .ai-banner .b-body b{font-size:13.5px;font-weight:800}
+  .ai-banner .b-body span{font-size:11px;color:var(--text);display:block;margin-top:1px}
+  .ai-banner .ai-go{background:var(--lav);color:#fff;font-size:11px;font-weight:800;padding:5px 10px;border-radius:99px;flex-shrink:0}
+  .rem-item{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:2px solid var(--line2);cursor:pointer}
+  .rem-item:last-child{border-bottom:none}
+  .rem-ico{width:42px;height:42px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .rem-ico.danger{background:var(--danger-soft);color:var(--danger)}
+  .rem-ico.warn{background:var(--amber-soft);color:var(--amber)}
+  .rem-ico.ok{background:var(--mint-soft);color:var(--mint)}
+  .rem-ico.primary{background:var(--primary-soft);color:var(--primary)}
+  .rem-ico.blue{background:var(--sky-soft);color:var(--sky)}
+  .rem-ico.teal{background:var(--mint-soft);color:var(--mint)}
+  .rem-ico.mint{background:var(--mint-soft);color:var(--mint)}
+  .rem-ico.amber{background:var(--amber-soft);color:var(--amber)}
+  .rem-ico.lav{background:var(--lav-soft);color:var(--lav)}
+  .rem-ico.pink{background:var(--pink-soft);color:var(--pink)}
+  .rem-body{flex:1;min-width:0}
+  .rem-body b{font-size:14px;display:block;font-weight:800}
+  .rem-body span{font-size:11.5px;color:var(--muted);margin-top:2px;display:block}
+  .rem-tag{font-size:11px;font-weight:800;padding:5px 11px;border-radius:99px;white-space:nowrap;line-height:1}
+  .rem-tag.red{background:var(--danger-soft);color:var(--danger)}
+  .rem-tag.amber{background:var(--amber-soft);color:#E8920A}
+  .rem-tag.green{background:var(--mint-soft);color:#22B08D}
+  .rem-tag.slate{background:#F1F0F4;color:#9A8E83}
+  .rem-tag.blue{background:var(--sky-soft);color:#3A9BE8}
+  .rem-tag.pink{background:var(--pink-soft);color:var(--pink)}
+  .rem-tag.ghost{background:transparent;box-shadow:inset 0 0 0 1.5px #E2D8CE;color:#B6A99C}
+
+  /* 日历 */
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px 2px;align-items:stretch}
+  .cal-grid .dow{font-size:11px;color:var(--muted);font-weight:700;height:22px;display:flex;align-items:center;justify-content:center}
+  .cal-grid .d{position:relative;height:38px;border-radius:12px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;line-height:1;font-variant-numeric:tabular-nums;font-feature-settings:'tnum'}
+  .cal-grid .d .dn{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;align-items:center;justify-content:center;line-height:1;z-index:1}
+  .cal-grid .d .dd{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:transparent;z-index:2}
+  .cal-grid .d.dot .dd{background:var(--primary)}
+  .cal-grid .d.dot.green .dd{background:var(--mint)}
+  .cal-grid .d.dot.pink .dd{background:var(--pink)}
+  .cal-grid .d.dim{color:#DCD2C8}
+  .cal-grid .d.today .dn{left:50%;right:auto;top:50%;bottom:auto;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;background:var(--primary);color:#fff;font-weight:800}
+  .cal-grid .d.today.dot .dd{background:#fff}
+  .cal-legend{display:flex;align-items:center;gap:14px;margin-top:10px;font-size:11px;color:var(--muted);font-weight:600}
+  .cal-legend i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--primary);margin-right:5px;vertical-align:1px}
+  .cal-legend i.pink{background:var(--pink)}
+  .cal-legend i.green{background:var(--mint)}
+
+  /* 首页日历 · 手绘可爱风 */
+  .home-cal{position:relative;background:#fff;border:2.5px solid var(--line);border-radius:28px 18px 30px 20px/20px 28px 18px 30px;padding:14px 14px 12px;box-shadow:0 6px 16px rgba(255,138,92,.10);overflow:hidden}
+  .home-cal::before{content:'';position:absolute;top:-22px;right:-22px;width:78px;height:78px;border-radius:50%;background:var(--pink-soft);opacity:.75}
+  .home-cal::after{content:'🐾';position:absolute;right:12px;bottom:4px;font-size:22px;opacity:.14;pointer-events:none}
+  .hcal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;position:relative;z-index:1}
+  .hcal-head .m{display:flex;align-items:baseline;gap:7px}
+  .hcal-head .m b{font-size:18px;font-weight:800;color:var(--ink);font-family:'YouYuan','Yuanti SC','PingFang SC',sans-serif}
+  .hcal-head .m span{font-size:12px;font-weight:700;color:var(--muted)}
+  .hcal-head .today-tag{font-size:11px;font-weight:800;color:#fff;background:linear-gradient(135deg,#FF9A6B,#FF7448);padding:4px 11px;border-radius:99px;box-shadow:0 3px 8px rgba(255,116,72,.25)}
+  .hcal-head .nav{display:flex;gap:6px;align-items:center}
+  .hcal-head .nav span{width:27px;height:27px;border-radius:9px;background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);font-size:13px;font-weight:700}
+  /* 体重变化独立模块 · 折线图可爱风 */
+  .trend-card{position:relative;background:#fff;border:2.5px solid var(--line);border-radius:24px 18px 26px 18px/18px 26px 18px 24px;padding:16px 14px 14px;box-shadow:0 6px 16px rgba(255,138,92,.08);overflow:hidden;margin-bottom:14px}
+  .trend-card::before{content:'🐾';position:absolute;left:12px;bottom:8px;font-size:20px;opacity:.14;pointer-events:none}
+  .trend-head{display:flex;align-items:center;margin-bottom:10px}
+  .trend-head .range-chips{display:flex;gap:6px}
+  .trend-head .range-chips .chip{padding:5px 11px;font-size:11.5px;border-radius:99px}
+  #weight-trend-svg{width:100%;height:auto;display:block}
+  .trend-legend{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:6px;font-size:10.5px;color:var(--muted);font-weight:600}
+  .weight-empty{display:none;padding:8px 2px 2px}
+  .weight-empty .we-inner{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 8px;text-align:center}
+  .weight-empty .we-paw{font-size:32px;opacity:.75;line-height:1}
+  .weight-empty b{font-size:14px;color:var(--ink);font-weight:800}
+  .weight-empty .we-sub,.weight-empty .we-tip{font-size:11.5px;color:var(--muted);font-weight:600;line-height:1.5}
+  .weight-empty .we-val{font-size:32px;font-weight:800;font-family:'ZCOOL KuaiLe','YouYuan','Yuanti SC',sans-serif;color:var(--primary);line-height:1}
+  .weight-empty .we-val small{font-size:14px;font-weight:700;color:var(--text)}
+  .weight-empty .we-date{font-size:12px;color:var(--muted);font-weight:700;margin-top:-2px}
+  .weight-empty .btn{width:auto;padding:8px 16px;margin-top:4px}
+
+  /* ===== 我的 ===== */
+  .profile{display:flex;align-items:center;gap:13px;background:#fff;border:2px solid var(--line);border-radius:22px;padding:16px}
+  .profile .avatar{width:56px;height:56px;border-radius:19px;object-fit:cover;background:var(--primary-soft)}
+  .profile .p-body{flex:1}
+  .profile .p-body b{font-size:17px;font-weight:800}
+  .profile .p-body span{font-size:12px;color:var(--muted);margin-top:2px;display:block}
+  .flag{font-size:10px;font-weight:800;color:#B9862C;background:#FFF1DA;padding:3px 9px;border-radius:8px;display:inline-block;margin-top:5px}
+  .grid2{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+  .gcell{background:#fff;border:2px solid var(--line);border-radius:18px;padding:13px 4px 12px;display:flex;flex-direction:column;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--text);cursor:pointer;transition:transform .12s ease}
+  .gcell:active{transform:scale(.94)}
+  .gcell .g-ico{width:40px;height:40px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:var(--primary-soft);color:var(--primary)}
+  .gcell .g-ico.blue{background:var(--sky-soft);color:var(--sky)}
+  .gcell .g-ico.violet{background:var(--lav-soft);color:var(--lav)}
+  .gcell .g-ico.amber{background:var(--amber-soft);color:var(--amber)}
+  .gcell .g-ico.pink{background:var(--pink-soft);color:var(--pink)}
+  .gcell .g-ico.danger{background:var(--danger-soft);color:var(--danger)}
+  .menu{background:#fff;border:2px solid var(--line);border-radius:22px;overflow:hidden;margin-top:14px}
+  .menu-item{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:2px solid var(--line2);cursor:pointer}
+  .menu-item:last-child{border-bottom:none}
+  .menu-item:active{background:#FFFBF7}
+  .m-ico{width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--text);flex-shrink:0}
+  .m-ico.amber{background:var(--amber-soft);color:var(--amber)}
+  .m-body{flex:1;font-size:14px;font-weight:700}
+  .m-val{font-size:12px;color:var(--muted);font-weight:600}
+
+  /* ===== 覆盖层页面 ===== */
+  .page{position:absolute;inset:0;z-index:10;background:var(--bg);display:none;flex-direction:column;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+  .page.open{display:flex;transform:translateX(0)}
+  .pheader{display:flex;align-items:center;gap:10px;padding:14px 16px 12px;flex-shrink:0}
+  .backbtn{width:40px;height:40px;border-radius:14px;background:#fff;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--text);cursor:pointer;flex-shrink:0}
+  .ptitle{flex:1;text-align:center;font-size:16px;font-weight:800}
+  .pact{font-size:13px;font-weight:700;color:var(--primary);cursor:pointer;padding:0 6px}
+
+  .seg{display:flex;background:#F6E9DB;border-radius:14px;padding:4px;margin:0 20px 14px;flex-shrink:0}
+  .seg div{flex:1;text-align:center;padding:8px;font-size:12.5px;font-weight:700;color:var(--muted);border-radius:11px;cursor:pointer;transition:.16s}
+  .seg div.on{background:#fff;color:var(--ink);box-shadow:0 2px 8px rgba(74,59,50,.10)}
+
+  .tabbar{position:absolute;left:0;right:0;bottom:0;z-index:6;display:flex;background:#fff;border-top:2px solid var(--line2);padding:10px 6px 18px;border-radius:0 0 35px 35px}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--muted);font-weight:700;cursor:pointer}
+  .tab.on{color:var(--primary)}
+  .tab .tab-ic{width:42px;height:30px;border-radius:99px;display:flex;align-items:center;justify-content:center;transition:.16s}
+  .tab.on .tab-ic{background:var(--primary-soft)}
+
+  /* 欢迎弹窗 */
+  .welcome{position:absolute;inset:0;z-index:20;background:rgba(30,22,18,.45);display:flex;align-items:center;justify-content:center;padding:30px}
+  .welcome.hide{display:none}
+  .welcome-card{background:#FFF6EF;border-radius:28px;padding:26px 22px 22px;max-width:300px;width:100%;text-align:center;box-shadow:0 24px 60px rgba(122,52,28,.28);animation:pop .28s cubic-bezier(.34,1.56,.64,1)}
+  .welcome-card img{width:116px;height:116px;border-radius:26px;object-fit:cover;box-shadow:0 12px 28px rgba(255,138,92,.24);margin-bottom:18px}
+  .welcome-card h2{font-size:22px;font-weight:800;letter-spacing:.3px}
+  .welcome-card h2 .hl{color:var(--primary)}
+  .welcome-card p{color:var(--text);font-size:14px;margin:10px 0 22px;line-height:1.7}
+  .welcome-card .btn{width:100%}
+  .welcome-skip{margin-top:13px;font-size:12.5px;color:var(--muted);font-weight:600;cursor:pointer}
+  @keyframes pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+
+  /* 通用表单 */
+  .field{background:#fff;border:2px solid var(--line);border-radius:18px;padding:14px 16px;margin-bottom:12px}
+  .field label{font-size:11.5px;color:var(--muted);font-weight:700;display:block;margin-bottom:6px}
+  .field .mock{font-size:14.5px;font-weight:700;display:flex;align-items:center;justify-content:space-between}
+  .field .mock .ph{color:var(--muted);font-weight:500}
+  .field input{width:100%;border:none;outline:none;background:transparent;font-size:14.5px;font-weight:600;font-family:inherit;color:var(--text)}
+  .field input::placeholder{color:#D6C9BC;font-weight:500}
+  .type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .type-grid .cell{background:#fff;border:2px solid var(--line);border-radius:16px;padding:14px 4px 12px;display:flex;flex-direction:column;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--text);cursor:pointer}
+  .type-grid .cell.on{border-color:var(--primary);background:var(--primary-tint);color:var(--primary)}
+  .type-grid .cell .ic{width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center}
+  .type-grid .cell .ic.amber{background:var(--amber-soft);color:var(--amber)}
+  .type-grid .cell .ic.blue{background:var(--sky-soft);color:var(--sky)}
+  .type-grid .cell .ic.teal{background:var(--mint-soft);color:var(--mint)}
+  .type-grid .cell .ic.pink{background:var(--pink-soft);color:var(--pink)}
+  .type-grid .cell .ic.slate{background:#F1F0F4;color:#9a94a8}
+  .type-grid .cell .ic.coral{background:var(--primary-soft);color:var(--primary)}
+  .type-grid .cell .ic.violet{background:var(--lav-soft);color:var(--lav)}
+
+  /* 记录类型分组 */
+  .type-group{margin-bottom:16px}
+  .tg-label{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:800;color:var(--ink);margin:2px 2px 9px}
+  .tg-label .n{font-size:10px;font-weight:700;color:var(--muted);background:var(--bg);padding:2px 8px;border-radius:99px;border:2px dashed var(--line)}
+  .tg-label::after{content:'';flex:1;height:0;border-top:2px dashed var(--line)}
+
+  /* 关联宠物切换 */
+  .pet-switch{display:flex;gap:10px}
+  .pet-switch .ps{flex:1;display:flex;align-items:center;gap:9px;background:#fff;border:2px solid var(--line);border-radius:16px;padding:10px 12px;cursor:pointer;font-size:13px;font-weight:700;color:var(--text);transition:.15s}
+  .pet-switch .ps img{width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid var(--line)}
+  .pet-switch .ps.on{border-color:var(--primary);background:var(--primary-tint);color:var(--primary)}
+  .pet-switch .ps.on img{border-color:var(--primary)}
+  .pet-switch .ps .sp{font-size:11px;color:var(--muted);font-weight:600}
+
+  /* 开关 */
+  .switch{position:relative;width:46px;height:26px;border-radius:99px;background:#E8E2DC;cursor:pointer;transition:.2s;flex-shrink:0}
+  .switch.on{background:var(--mint)}
+  .switch::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+  .switch.on::after{left:23px}
+
+  /* AI 组件 */
+  .ai-loading{display:flex;align-items:center;gap:8px;padding:12px 16px;color:var(--lav);font-size:13px;font-weight:700}
+  .ai-loading i{width:8px;height:8px;border-radius:50%;background:var(--lav);animation:blink 1s infinite}
+  .ai-loading i:nth-child(2){animation-delay:.2s}
+  .ai-loading i:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+  .ai-gen-tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:800;color:#7C6CF0;background:var(--lav-soft);padding:3px 8px;border-radius:8px}
+  .ai-note{display:flex;gap:6px;font-size:11px;color:var(--muted);align-items:flex-start;margin-top:12px;line-height:1.5}
+  .plan-item{display:flex;gap:12px;padding:13px 14px;background:#fff;border:2px solid var(--line);border-radius:18px;margin-bottom:10px}
+  .plan-chk{width:24px;height:24px;border-radius:8px;border:2px solid var(--line);background:#fff;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;transition:.15s;margin-top:1px}
+  .plan-chk.on{background:var(--mint);border-color:var(--mint)}
+  .plan-body b{font-size:13.5px;font-weight:800}
+  .plan-body p{font-size:11.5px;color:var(--text);margin-top:3px;line-height:1.55}
+
+  /* 速查表 */
+  .food-hero{background:linear-gradient(135deg,#FFB27A,#FF8A5C);border-radius:20px;padding:18px;color:#fff}
+  .food-search{display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.95);border-radius:15px;padding:12px 14px;color:var(--text);font-weight:600;margin-top:14px;cursor:pointer}
+  .food-s .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;display:inline-block;margin-right:5px}
+  .food-s .dot.g{background:var(--mint)}
+  .food-s .dot.y{background:var(--amber)}
+  .food-s .dot.r{background:var(--danger)}
+  .quick-food{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+  .quick-food .cf{background:#fff;border:2px solid var(--line);border-radius:99px;padding:7px 13px;font-size:12px;font-weight:700;color:var(--text);cursor:pointer}
+  .food-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:2px solid var(--line2)}
+  .food-row:last-child{border-bottom:none}
+  .food-name{flex:1;font-size:13.5px;font-weight:700}
+  .food-s{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700}
+
+  /* 时间线 */
+  .timeline{position:relative;padding-left:22px}
+  .timeline::before{content:'';position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:var(--line)}
+  .tl-item{position:relative;margin-bottom:16px}
+  .tl-item::before{content:'';position:absolute;left:-22px;top:4px;width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid var(--primary)}
+  .tl-item .ph{width:100%;height:130px;border-radius:16px;object-fit:cover;background:var(--bg)}
+  .tl-item .cap{font-size:12px;color:var(--text);margin-top:6px;font-weight:600}
+
+  .mascot-hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:6px 0 4px}
+  .mascot-hero img{width:120px;height:120px;border-radius:30px;object-fit:cover;box-shadow:0 14px 30px rgba(255,138,92,.22)}
+  .mascot-hero b{font-size:18px;font-weight:800;margin-top:12px}
+  .mascot-hero span{font-size:12px;color:var(--muted);margin-top:4px}
+
+  /* 首页宠物切换胶囊 */
+  .home-pet-switch{display:flex;gap:8px;margin-top:14px;position:relative;z-index:2}
+  .home-pet-switch .hps{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.32);border-radius:99px;padding:7px 10px;color:#fff;font-size:12.5px;font-weight:800;cursor:pointer;transition:.15s}
+  .home-pet-switch .hps img{width:22px;height:22px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(255,255,255,.65)}
+  .home-pet-switch .hps.on{background:#fff;color:var(--primary-600);border-color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.16)}
+  .home-pet-switch .hps.on img{border-color:var(--primary)}
+
+  /* 宠物头像编辑（自动生成 / 上传） */
+  .avatar-wrap{position:relative;width:120px;height:120px}
+  .avatar-wrap img{display:block}
+  .avatar-edit{position:absolute;right:-6px;bottom:-6px;width:38px;height:38px;border-radius:13px;background:linear-gradient(135deg,#FF9A6B,#FF7448);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px rgba(255,116,72,.32);cursor:pointer}
+  .avatar-edit .ico{width:18px;height:18px}
+  .avatar-actions{display:none;gap:9px;margin-top:14px;width:100%}
+  .avatar-actions .va{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;background:var(--primary-tint);border:2px solid var(--primary-soft);border-radius:16px;padding:11px 6px;font-size:11.5px;font-weight:700;color:var(--primary-600);cursor:pointer}
+  .avatar-actions .va.alt{background:var(--lav-soft);border-color:var(--lav-soft);color:var(--lav)}
+  .avatar-actions .va .ico{width:20px;height:20px}
+
+  /* 首页宠物切换：紧凑分段胶囊（顶部） */
+  .pet-seg{display:inline-flex;gap:2px;background:#fff;border:1px solid var(--line);border-radius:99px;padding:3px;margin:0 0 10px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+  .pet-seg .pseg{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:99px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;transition:.15s;white-space:nowrap}
+  .pet-seg .pseg img{width:18px;height:18px;border-radius:50%;object-fit:cover;border:1.5px solid transparent}
+  .pet-seg .pseg.on{background:var(--primary-tint);color:var(--primary-600)}
+  .pet-seg .pseg.on img{border-color:var(--primary)}
+
+  /* 新建提醒：关联宠物（横向单选胶囊） */
+  .pet-select{display:flex;gap:10px;margin-bottom:14px}
+  .pet-card{display:flex;align-items:center;gap:9px;background:#fff;border:2px solid var(--line);border-radius:99px;padding:7px 15px 7px 7px;cursor:pointer;transition:.15s;flex:1;justify-content:center}
+  .pet-card img{width:32px;height:32px;border-radius:50%;object-fit:cover;flex:none}
+  .pet-card .pc-body{display:flex;align-items:center;gap:6px}
+  .pet-card .pc-body b{font-size:14px;font-weight:800;line-height:1}
+  .pet-card .pc-body span{display:none}
+  .pet-card .pc-check{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;color:transparent;flex:none}
+  .pet-card .pc-check .ico{width:11px;height:11px}
+  .pet-card.on{border-color:var(--primary);background:var(--primary-tint)}
+  .pet-card.on .pc-check{background:var(--primary);border-color:var(--primary);color:#fff}
+
+  /* 新建提醒：选项芯片组 */
+  .opt-group{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px}
+  .opt-chip{font-size:12.5px;font-weight:700;color:var(--text);background:#fff;border:2px solid var(--line);border-radius:99px;padding:7px 14px;cursor:pointer;transition:.15s;user-select:none}
+  .opt-chip.on{border-color:var(--primary);background:var(--primary-tint);color:var(--primary-600)}
+
+  /* 新建提醒：真实输入框 */
+  .rem-input{width:100%;border:none;outline:none;background:transparent;font-size:15px;font-weight:800;font-family:inherit;color:var(--ink);padding:2px 0}
+  .rem-input::placeholder{color:#D6C9BC;font-weight:600}
+
+  /* BCS 体况评分标准面板 */
+  .bcs-panel{margin-top:12px}
+  .bcs-row{display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:2px solid var(--line2)}
+  .bcs-row:last-child{border-bottom:none}
+  .bcs-num{width:26px;height:26px;border-radius:8px;background:var(--lav-soft);color:var(--lav);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex:none}
+  .bcs-row b{font-size:13px;font-weight:700}
+  .bcs-row span{font-size:12px;color:var(--muted);margin-left:auto;text-align:right}
+
+  /* 照相馆预览 */
+  .photo-preview{position:relative;border-radius:20px;overflow:hidden;background:#f5eadf;margin-bottom:14px}
+  .photo-preview img{width:100%;height:220px;object-fit:cover;display:block}
+  .pp-frame{position:absolute;left:12px;bottom:12px;background:rgba(0,0,0,.4);color:#fff;font-size:11px;font-weight:700;padding:5px 11px;border-radius:99px;backdrop-filter:blur(4px)}
+
+  /* 待办 / 提醒 已完成的视觉状态 */
+  .todo-card.done .todo-body b,.todo-card.done .todo-body span,
+  .rem-item.done .rem-body b,.rem-item.done .rem-body span{text-decoration:line-through;color:var(--muted)}
+  .todo-card.done .todo-ico{background:var(--mint-soft) !important;color:var(--mint) !important}
+  .rem-item.done .rem-ico{background:#F1F0F4 !important;color:#C4B9AE !important;opacity:.7}
+  .rem-item.done .rem-tag{background:var(--mint-soft) !important;color:#22B08D !important}
+  .rem-item.off .rem-ico{opacity:.55}
+
+  /* 提醒详情：字段输入框（默认只读，编辑态可输入） */
+  .rd-field.rem-input{color:var(--ink);font-size:14.5px;font-weight:700;cursor:default;padding:6px 10px;border-radius:12px;margin-left:-10px}
+  .rd-field.rem-input[readonly]{-webkit-tap-highlight-color:transparent}
+  .rd-field.rem-input:not([readonly]){background:var(--primary-tint);box-shadow:inset 0 0 0 2px var(--primary);cursor:text}
+  .rem-empty{padding:26px 10px;text-align:center;color:var(--muted);font-size:13px;font-weight:600}
+
+  /* AI 健康档案：可展开明细 */
+  .exp{margin:2px 2px 8px;padding:10px 12px;background:var(--bg);border-radius:12px;font-size:12px;color:var(--text);line-height:1.6}
+  .exp-row{display:flex;align-items:center;gap:8px;padding:4px 0}
+  .exp-row span{width:42px;font-size:12px;color:var(--muted);flex-shrink:0}
+  .exp-row b{flex:1;font-size:12.5px;font-weight:700}
+  .exp-row em{font-size:11px;font-weight:800;font-style:normal;padding:2px 8px;border-radius:99px}
+  .exp-row em.ok{color:var(--mint);background:var(--mint-soft)}
+  .exp-row em.warn{color:var(--amber);background:var(--amber-soft)}
+
+  /* 全局 toast 反馈 */
+  .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(12px);background:rgba(30,28,34,.92);color:#fff;font-size:13px;font-weight:600;padding:11px 18px;border-radius:99px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:9999;opacity:0;pointer-events:none;transition:.22s;max-width:80%;text-align:center}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* ===== 头像操作底部面板 ===== */
+  .sheet-mask{position:absolute;inset:0;z-index:120;background:rgba(25,20,20,.42);display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .2s}
+  .sheet-mask.show{opacity:1;pointer-events:auto}
+  .sheet{width:100%;background:#fff;border-radius:24px 24px 0 0;padding:12px 16px 22px;transform:translateY(100%);transition:transform .24s cubic-bezier(.4,0,.2,1)}
+  .sheet-mask.show .sheet{transform:translateY(0)}
+  .sheet .stitle{text-align:center;font-size:11px;color:var(--muted);font-weight:700;padding:6px 0 12px}
+  .sheet-row{display:flex;align-items:center;gap:13px;padding:14px 6px;border-top:2px solid var(--line2);cursor:pointer;font-size:15px;font-weight:700;color:var(--text)}
+  .sheet-row:first-of-type{border-top:none}
+  .sheet-row .s-ico{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .sheet-row .s-ico .ico{width:20px;height:20px}
+  .sheet-row.dl .s-ico{background:var(--primary-tint);color:var(--primary-600)}
+  .sheet-row.up .s-ico{background:var(--mint-soft);color:var(--mint)}
+  .sheet-row.cancel{justify-content:center;color:var(--muted);font-weight:600;margin-top:8px;background:var(--bg);border-radius:16px;border-top:none}
+</style>
+</head>
+<body>
+<div class="board">
+  <div class="board-head">
+    <h1><span class="paw">🐾</span>宠记 <span class="hl">PetLog</span></h1>
+    <p>AI 养宠健康管家 · 可爱简洁萌宠风原型</p>
+  </div>
+  <div class="hint">点击 <b>Tab</b> 切换页面 · 点击卡片/按钮进入详情页 · 图上是「小白」的示例数据</div>
+
+  <div class="stage">
+    <div class="phone">
+      <div class="viewport" id="vp">
+
+        <!-- ============ SVG 图标库 ============ -->
+        <svg style="position:absolute;width:0;height:0" aria-hidden="true">
+          <defs>
+            <symbol id="i-paw" viewBox="0 0 24 24"><g fill="currentColor"><ellipse cx="7.5" cy="8.5" rx="2" ry="2.6"/><ellipse cx="12" cy="7" rx="2.1" ry="2.7"/><ellipse cx="16.5" cy="8.5" rx="2" ry="2.6"/><ellipse cx="5" cy="12.5" rx="1.7" ry="2.2"/><ellipse cx="19" cy="12.5" rx="1.7" ry="2.2"/><path d="M12 11.2c3.3 0 5.6 2.6 5.6 5.3a5.6 5.6 0 0 1-11.2 0c0-2.7 2.3-5.3 5.6-5.3z"/></g></symbol>
+            <symbol id="i-home" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></g></symbol>
+            <symbol id="i-list" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></g></symbol>
+            <symbol id="i-bell" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 20a2.2 2.2 0 0 0 4 0"/></g></symbol>
+            <symbol id="i-user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></g></symbol>
+            <symbol id="i-plus" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></g></symbol>
+            <symbol id="i-chev-r" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></g></symbol>
+            <symbol id="i-chev-l" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></g></symbol>
+            <symbol id="i-check" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></g></symbol>
+            <symbol id="i-cal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M16 3v4M8 3v4M3 11h18"/></g></symbol>
+            <symbol id="i-droplet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></g></symbol>
+            <symbol id="i-scale" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v3M6 8h12"/><path d="M6 8a6 6 0 0 0 12 0"/><path d="M9 13v7M15 13v7M9 20h6"/></g></symbol>
+            <symbol id="i-capsule" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="6" rx="3"/><path d="M9 9l6 6"/></g></symbol>
+            <symbol id="i-medical" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></g></symbol>
+            <symbol id="i-clipcheck" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="3"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/><path d="M9 12l2 2 4-4"/></g></symbol>
+            <symbol id="i-camera" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/></g></symbol>
+            <symbol id="i-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></g></symbol>
+            <symbol id="i-gear" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></g></symbol>
+            <symbol id="i-moon" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z"/></g></symbol>
+            <symbol id="i-image" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></g></symbol>
+            <symbol id="i-mic" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M12 18v3"/><path d="M8 21h8"/></g></symbol>
+            <symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></g></symbol>
+            <symbol id="i-location" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></g></symbol>
+            <symbol id="i-food" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></g></symbol>
+            <symbol id="i-heart" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/></g></symbol>
+            <symbol id="i-sparkle" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.7 5.1L18.8 10l-5.1 1.7L12 16.8l-1.7-5.1L5.2 10l5.1-1.9z"/><path d="M18.5 15l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z"/></g></symbol>
+            <symbol id="i-users" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c0-3 2.3-5 5.5-5s5.5 2 5.5 5"/><path d="M16 5a3 3 0 0 1 0 6"/><path d="M18 15c2.3 0 4 2 4 5"/></g></symbol>
+            <symbol id="i-shield" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></g></symbol>
+            <symbol id="i-star" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.2l5.9-.9z"/></g></symbol>
+            <symbol id="i-edit" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></g></symbol>
+            <symbol id="i-info" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></g></symbol>
+            <symbol id="i-share" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/></g></symbol>
+            <symbol id="i-download" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></g></symbol>
+            <symbol id="i-file" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M9 13h6M9 17h4"/></g></symbol>
+            <symbol id="i-camera-ai" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/><path d="M14.5 8l1.5-2" stroke-dasharray="2 1.5"/></g></symbol>
+            <symbol id="i-bell-heart" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M12 13.5c0 .6-.4 1-1 1s-1-.4-1-1 1-1.3 1-1.3 1 .7 1 1.3zM14 15.5c0 .4-.3.8-.8.8s-.8-.4-.8-.8.8-1.1.8-1.1.8.7.8 1.1z"/></g></symbol>
+            <symbol id="i-bath" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14h18M6 14a6 6 0 0 0 12 0"/><path d="M12 3v4M8.5 4h7"/><path d="M9 9v1.5M12 9v2M15 9v1.5"/></g></symbol>
+            <symbol id="i-nail" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7a7 7 0 0 1 14 0"/><path d="M5 7h14"/><path d="M6 13a6 6 0 0 0 12 0H6z"/></g></symbol>
+            <symbol id="i-tooth" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15h11"/><path d="M14 15h5a1.5 1.5 0 0 1 1.5 1.5V18a3 3 0 0 1-3 3h-1a3 3 0 0 1-3-3"/><path d="M16 11v1.5M19 11v1.5"/></g></symbol>
+            <symbol id="i-anal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"/><path d="M5.5 7.5C4 8.8 3 10.8 3 13s1 4.2 2.5 5.5"/><path d="M18.5 7.5C20 8.8 21 10.8 21 13s-1 4.2-2.5 5.5"/></g></symbol>
+            <symbol id="i-cage" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V9a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v11"/><path d="M3 20h18"/><path d="M8 10v7M12 10v7M16 10v7"/></g></symbol>
+            <symbol id="i-bowl" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11h16a8 8 0 0 1-16 0z"/><path d="M3 11h18"/></g></symbol>
+            <symbol id="i-litter" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l16 16"/><path d="M14 20h6l-3-3"/><path d="M4 10l6-6 6 6z"/></g></symbol>
+            <symbol id="i-cake" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11h16v4a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M4 14h16"/><path d="M8 8a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1"/><path d="M12 8V5M10 5h4"/></g></symbol>
+            <symbol id="i-memo" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 9h18"/><path d="M12 13.5l.8.8 2-2"/></g></symbol>
+          </defs>
+        </svg>
+
+        <!-- ============ 欢迎弹窗 ============ -->
+        <div class="welcome" id="welcome">
+          <div class="welcome-card">
+            <img src="assets/moe/welcome.jpg" alt="欢迎插画">
+            <h2>欢迎来到<span class="hl">宠记</span> 🐾</h2>
+            <p>把散落在各处的养宠信息，<br>翻译成一句句「该做什么」。</p>
+            <div class="btn btn-primary" onclick="startOnboarding()">开始体验</div>
+            <div class="welcome-skip" onclick="closeWelcome()">随便逛逛 ›</div>
+          </div>
+        </div>
+
+        <!-- ============ 首页 ============ -->
+        <div class="tab-screen active" data-screen="home">
+          <div class="statusbar"><span>9:41</span><span class="s-ico">📶 🔋</span></div>
+          <div class="header">
+            <div class="eyebrow">TODAY · 9月7日</div>
+            <div class="hero-btn" data-open="pg-notify"><svg class="ico"><use href="#i-bell"/></svg><span class="dot-red"></span></div>
+          </div>
+          <div class="scroll">
+            <div class="pet-seg" id="home-pet-switch">
+              <div class="pseg on" data-pet="cat"><img src="assets/moe/avatar-cat.jpg" alt="小白"><span>小白</span></div>
+              <div class="pseg" data-pet="dog"><img src="assets/moe/avatar-dog.jpg" alt="豆豆"><span>豆豆</span></div>
+            </div>
+            <div class="hero">
+              <div class="deco"></div><div class="deco2"></div>
+              <span class="hero-float f1"><svg class="ico"><use href="#i-paw"/></svg></span>
+              <span class="hero-float f2"><svg class="ico"><use href="#i-sparkle"/></svg></span>
+              <div class="hero-top">
+                <div class="hero-txt">
+                  <div class="hero-hi" id="home-hi"><span id="home-pet-name">小白</span> · <span id="home-greet">主人早呀</span> 🐾</div>
+                  <div class="hero-name" id="home-name">我已经 7 天没有驱虫啦，快来帮我驱虫吧</div>
+                </div>
+                <div class="hero-mascot" id="home-mascot-wrap"><img id="home-mascot" src="assets/moe/hero-cat.jpg" alt="小白插画"><span class="cam"><svg class="ico"><use href="#i-camera"/></svg></span></div>
+              </div>
+              <div class="hero-actions">
+                <div class="ha" data-open="pg-ai-center"><span class="sp"><svg class="ico"><use href="#i-sparkle"/></svg></span>AI 养宠助手</div>
+                <div class="ha alt" data-open="pg-health-ai"><span class="sp"><svg class="ico"><use href="#i-clipcheck"/></svg></span>健康档案</div>
+              </div>
+            </div>
+
+            <div class="section-head"><b>快捷操作</b></div>
+            <div class="quick" style="grid-template-columns:repeat(4,1fr)">
+              <div class="cell" data-open="pg-new-record"><span class="ic coral"><svg class="ico"><use href="#i-plus"/></svg></span>记一笔</div>
+              <div class="cell" data-open="pg-weight"><span class="ic sky"><svg class="ico"><use href="#i-scale"/></svg></span>体重</div>
+              <div class="cell" data-open="pg-new-reminder"><span class="ic amber"><svg class="ico"><use href="#i-bell-heart"/></svg></span>提醒</div>
+              <div class="cell" data-open="pg-photo-bcs"><span class="ic mint"><svg class="ico"><use href="#i-camera-ai"/></svg></span>估体况</div>
+            </div>
+
+            <div class="section-head"><b>今日待办</b><a data-open="pg-todo">全部 ›</a></div>
+            <div class="card todo-card" style="margin-bottom:10px" data-open="pg-handle">
+              <div class="todo-ico danger" id="todo1-ico"><svg class="ico"><use href="#i-droplet"/></svg></div>
+              <div class="todo-body"><b id="todo1-title">体内驱虫到期</b><span id="todo1-desc">小白 · 已超 7 天，赶紧处理</span></div>
+              <span class="btn btn-ghost">处理</span>
+            </div>
+            <div class="card todo-card" data-open="pg-book">
+              <div class="todo-ico amber" id="todo2-ico"><svg class="ico"><use href="#i-medical"/></svg></div>
+              <div class="todo-body"><b id="todo2-title">狂犬疫苗预约</b><span id="todo2-desc">小白 · 3 天后到期</span></div>
+              <svg class="ico sm chev"><use href="#i-chev-r"/></svg>
+            </div>
+
+            <div class="section-head"><b>体重变化</b></div>
+            <div class="trend-card">
+              <div class="trend-head"><div class="range-chips" id="weight-range"><span class="chip on" data-range="3m">近3月</span><span class="chip" data-range="6m">近6月</span><span class="chip" data-range="1y">近1年</span></div></div>
+              <svg id="weight-trend-svg" viewBox="0 0 320 120" preserveAspectRatio="xMidYMid meet"></svg>
+              <div class="weight-empty" id="weight-empty"></div>
+              <div class="trend-legend" id="trend-legend">🐾 体重稳步上升 · 健康在线</div>
+            </div>
+
+            <div class="section-head"><b>本月日历</b></div>
+            <div class="home-cal" id="home-cal">
+              <div class="hcal-head">
+                <div class="m"><b>9 月</b><span>2026</span></div>
+                <span class="today-tag">今天 · 7 号</span>
+                <div class="nav"><span title="上个月">‹</span><span title="下个月">›</span></div>
+              </div>
+              <div class="cal-grid">
+                <div class="dow">日</div><div class="dow">一</div><div class="dow">二</div><div class="dow">三</div><div class="dow">四</div><div class="dow">五</div><div class="dow">六</div>
+                <div class="d dim"><span class="dn">30</span><span class="dd"></span></div><div class="d dim"><span class="dn">31</span><span class="dd"></span></div><div class="d"><span class="dn">1</span><span class="dd"></span></div><div class="d dot"><span class="dn">2</span><span class="dd"></span></div><div class="d"><span class="dn">3</span><span class="dd"></span></div><div class="d dot"><span class="dn">4</span><span class="dd"></span></div><div class="d"><span class="dn">5</span><span class="dd"></span></div>
+                <div class="d"><span class="dn">6</span><span class="dd"></span></div><div class="d today"><span class="dn">7</span><span class="dd"></span></div><div class="d"><span class="dn">8</span><span class="dd"></span></div><div class="d"><span class="dn">9</span><span class="dd"></span></div><div class="d dot"><span class="dn">10</span><span class="dd"></span></div><div class="d"><span class="dn">11</span><span class="dd"></span></div><div class="d"><span class="dn">12</span><span class="dd"></span></div>
+                <div class="d"><span class="dn">13</span><span class="dd"></span></div><div class="d"><span class="dn">14</span><span class="dd"></span></div><div class="d"><span class="dn">15</span><span class="dd"></span></div><div class="d"><span class="dn">16</span><span class="dd"></span></div><div class="d"><span class="dn">17</span><span class="dd"></span></div><div class="d dot"><span class="dn">18</span><span class="dd"></span></div><div class="d dot pink"><span class="dn">19</span><span class="dd"></span></div>
+                <div class="d"><span class="dn">20</span><span class="dd"></span></div><div class="d"><span class="dn">21</span><span class="dd"></span></div><div class="d dot"><span class="dn">22</span><span class="dd"></span></div><div class="d"><span class="dn">23</span><span class="dd"></span></div><div class="d"><span class="dn">24</span><span class="dd"></span></div><div class="d"><span class="dn">25</span><span class="dd"></span></div><div class="d"><span class="dn">26</span><span class="dd"></span></div>
+                <div class="d"><span class="dn">27</span><span class="dd"></span></div><div class="d"><span class="dn">28</span><span class="dd"></span></div><div class="d"><span class="dn">29</span><span class="dd"></span></div><div class="d"><span class="dn">30</span><span class="dd"></span></div><div class="d dim"><span class="dn">1</span><span class="dd"></span></div><div class="d dim"><span class="dn">2</span><span class="dd"></span></div><div class="d dim"><span class="dn">3</span><span class="dd"></span></div>
+              </div>
+              <div class="cal-legend"><span><i></i>待办</span><span><i class="green"></i>记录</span><span><i class="pink"></i>纪念日</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ 记录 ============ -->
+        <div class="tab-screen" data-screen="records">
+          <div class="statusbar"><span>9:41</span><span class="s-ico">📶 🔋</span></div>
+          <div class="header">
+            <div><div class="eyebrow">MEMO</div><div class="title">记录</div></div>
+            <div class="iconbtn" data-open="pg-search"><svg class="ico"><use href="#i-search"/></svg></div>
+          </div>
+
+          <div class="seg" id="rec-seg">
+            <div class="on" data-view="list">事项记录</div>
+            <div data-view="growth">成长记录</div>
+          </div>
+
+          <div id="rec-list" style="display:flex;flex-direction:column;flex:1;min-height:0">
+            <div class="chiprow" id="rec-chips">
+              <div class="chip on" data-cat="all">全部</div>
+              <div class="chip" data-cat="health">基础健康</div>
+              <div class="chip" data-cat="groom">清洁洗护</div>
+              <div class="chip" data-cat="clean">打理清扫</div>
+              <div class="chip" data-cat="other">其他</div>
+            </div>
+            <div class="scroll">
+              <div class="t-entry" data-cat="health" data-open="pg-record-detail"><div class="t-ico amber"><svg class="ico"><use href="#i-droplet"/></svg></div><div class="t-body"><b>体内驱虫</b><span>海乐妙 · 下次 11-30</span></div><svg class="ico sm chev"><use href="#i-chev-r"/></svg></div>
+              <div class="t-entry" data-cat="health" data-open="pg-record-detail"><div class="t-ico amber"><svg class="ico"><use href="#i-droplet"/></svg></div><div class="t-body"><b>外用驱虫</b><span>拜宠清 · 下次 9-1</span></div><svg class="ico sm chev"><use href="#i-chev-r"/></svg></div>
+              <div class="t-entry" data-cat="health" data-open="pg-record-detail"><div class="t-ico teal"><svg class="ico"><use href="#i-medical"/></svg></div><div class="t-body"><b>狂犬疫苗</b><span>已接种 · 次年 6 月</span></div><svg class="ico sm chev"><use href="#i-chev-r"/></svg></div>
+              <div class="t-entry" data-cat="health" data-open="pg-record-detail"><div class="t-ico teal"><svg class="ico"><use href="#i-medical"/></svg></div><div class="t-body"><b>猫三联第3针</b><span>妙三多 · 已接种</span></div><svg class="ico sm chev"><use href="#i-chev-r"/></svg></div>
+              <div class="t-entry" data-cat="health" data-open="pg-record-detail"><div class="t-ico blue"><svg class="ico"><use href="#i-clipcheck"/></svg></div><div class="t-body"><b>年度体检</b><span>报告已归档 · 无异常</span></div><svg class="ico sm chev"><use href="#i-chev-r"/></svg></div>
+              <div class="t-entry" data-cat="health" data-open="pg-record-detail"><div class="t-ico slate"><svg class="ico"><use href="#i-scale"/></svg></div><div class="t-body"><b>体重记录</b><span>4.2 kg · 较上月 +0.1</span></div><svg class="ico sm chev"><use href="#i-chev-r"/></svg></div>
+              <div class="t-entry" data-cat="groom" data-open="pg-record-detail"><div class="t-ico blue"><svg class="ico"><use href="#i-bath"/></svg></div><div class="t-body"><b>洗澡</b><span>小白 · 香波 · 今天 14:20</span></div><svg class="ico sm chev"><use href="#i-chev-r"/></svg></div>
+              <div class="t-entry" data-cat="groom" data-open="pg-record-detail"><div class="t-ico pink"><svg class="ico"><use href="#i-nail"/></svg></div><div class="t-body"><b>剪指甲</b><span>小白 · 全爪修剪 · 2 天前</span></div><svg class="ico sm chev"><use href="#i-chev-r"/></svg></div>
+              <div class="t-entry" data-cat="groom" data-open="pg-record-detail"><div class="t-ico teal"><svg class="ico"><use href="#i-tooth"/></svg></div><div class="t-body"><b>刷牙</b><span>小白 · 宠物牙膏 · 3 天前</span></div><svg class="ico sm chev"><use href="#i-chev-r"/></svg></div>
+              <div class="t-entry" data-cat="groom" data-open="pg-record-detail"><div class="t-ico coral"><svg class="ico"><use href="#i-anal"/></svg></div><div class="t-body"><b>挤肛门腺</b><span>豆豆 · 狗狗 · 今天 15:40</span></div><svg class="ico sm chev"><use href="#i-chev-r"/></svg></div>
+              <div class="t-entry" data-cat="clean" data-open="pg-record-detail"><div class="t-ico slate"><svg class="ico"><use href="#i-litter"/></svg></div><div class="t-body"><b>换猫砂</b><span>小白 · 整盆更换 · 昨天</span></div><svg class="ico sm chev"><use href="#i-chev-r"/></svg></div>
+              <div class="t-entry" data-cat="clean" data-open="pg-record-detail"><div class="t-ico amber"><svg class="ico"><use href="#i-bowl"/></svg></div><div class="t-body"><b>洗碗</b><span>小白 · 水碗饭盆 · 3 天前</span></div><svg class="ico sm chev"><use href="#i-chev-r"/></svg></div>
+              <div class="t-entry" data-cat="clean" data-open="pg-record-detail"><div class="t-ico coral"><svg class="ico"><use href="#i-cage"/></svg></div><div class="t-body"><b>洗猫窝</b><span>小白 · 已烘干消毒 · 5 天前</span></div><svg class="ico sm chev"><use href="#i-chev-r"/></svg></div>
+              <div class="t-entry" data-cat="other" data-open="pg-record-detail"><div class="t-ico violet"><svg class="ico"><use href="#i-memo"/></svg></div><div class="t-body"><b>宠物美容院预约</b><span>自定义 · 下周 14:00</span></div><svg class="ico sm chev"><use href="#i-chev-r"/></svg></div>
+            </div>
+            <div class="fab" data-open="pg-new-record"><svg class="ico lg"><use href="#i-plus"/></svg></div>
+          </div>
+
+          <div id="rec-growth" style="display:none;flex-direction:column;flex:1;min-height:0">
+            <div class="scroll">
+              <div class="section-head"><b>纪念日</b><a data-open="pg-memo-add">+ 添加</a></div>
+              <div class="card" style="padding:4px 14px;margin-bottom:4px">
+                <div class="rem-item"><div class="rem-ico pink"><svg class="ico"><use href="#i-cake"/></svg></div><div class="rem-body"><b>小白 · 生日 🎂</b><span>2024-03-15 · 每周年提醒</span></div><span class="switch on"></span></div>
+                <div class="rem-item"><div class="rem-ico amber"><svg class="ico"><use href="#i-memo"/></svg></div><div class="rem-body"><b>到家纪念日 🏠</b><span>2024-06-01 · 提醒已关闭</span></div><span class="switch"></span></div>
+              </div>
+              <div class="section-head"><b>成长瞬间</b></div>
+              <div class="timeline">
+                <div class="tl-item"><img class="ph" src="assets/moe/avatar-cat.jpg" alt="8月"><div class="cap">2026 年 8 月 · 睡姿逐渐奔放 🐱</div></div>
+                <div class="tl-item"><img class="ph" src="assets/moe/welcome.jpg" alt="6月"><div class="cap">2026 年 6 月 · 第一次去公园，开心到模糊</div></div>
+                <div class="tl-item"><img class="ph" src="assets/moe/avatar-dog.jpg" alt="3月"><div class="cap">2026 年 3 月 · 和豆豆的第一张合照</div></div>
+              </div>
+            </div>
+            <div class="fab" data-open="pg-pet-photo"><svg class="ico lg"><use href="#i-camera"/></svg></div>
+          </div>
+        </div>
+
+        <!-- ============ 提醒 ============ -->
+        <div class="tab-screen" data-screen="reminders">
+          <div class="statusbar"><span>9:41</span><span class="s-ico">📶 🔋</span></div>
+          <div class="header">
+            <div><div class="eyebrow">PLAN</div><div class="title">提醒</div></div>
+            <div class="iconbtn" data-open="pg-new-reminder"><svg class="ico"><use href="#i-plus"/></svg></div>
+          </div>
+          <div class="scroll">
+            <div class="ai-banner" data-open="pg-plan-ai">
+              <div class="ai-ic"><svg class="ico"><use href="#i-sparkle"/></svg></div>
+              <div class="b-body"><b>AI 智能规划</b><span>按品种 / 季节 / 档案，一键排好本月提醒</span></div>
+              <span class="ai-go">一键生成</span>
+              <svg class="ico sm" style="color:var(--lav)"><use href="#i-chev-r"/></svg>
+            </div>
+
+            <div class="section-head" style="margin-top:4px"><b>待办提醒</b><span style="font-size:12px;color:var(--muted)" id="rem-overdue-count">1 项逾期</span></div>
+
+            <div class="card" style="padding:4px 14px" id="rem-list-card">
+              <div class="rem-item" data-rem="deworm-in" data-open="pg-reminder-detail"><div class="rem-ico primary"><svg class="ico"><use href="#i-droplet"/></svg></div><div class="rem-body"><b>体内驱虫</b><span>小白 · 每 3 个月</span></div><span class="rem-tag red">已逾期 · 7天</span></div>
+              <div class="rem-item" data-rem="vaccine" data-open="pg-reminder-detail"><div class="rem-ico blue"><svg class="ico"><use href="#i-medical"/></svg></div><div class="rem-body"><b>狂犬疫苗</b><span>小白 · 每年接种</span></div><span class="rem-tag amber">3 天后</span></div>
+              <div class="rem-item" data-rem="checkup" data-open="pg-reminder-detail"><div class="rem-ico ok"><svg class="ico"><use href="#i-clipcheck"/></svg></div><div class="rem-body"><b>年度体检</b><span>小白 · 每年一次</span></div><span class="rem-tag blue">已预约</span></div>
+              <div class="rem-item" data-rem="deworm-out" data-open="pg-reminder-detail"><div class="rem-ico primary"><svg class="ico"><use href="#i-clock"/></svg></div><div class="rem-body"><b>外用驱虫</b><span>小白 · 每月 1 日</span></div><span class="rem-tag slate">进行中</span></div>
+              <div class="rem-item done" data-rem="bath-done"><div class="rem-ico lav"><svg class="ico"><use href="#i-bath"/></svg></div><div class="rem-body"><b>洗澡美容</b><span>小白 · 今天 14:20 已完成</span></div><span class="rem-tag green">已完成</span></div>
+              <div class="rem-item" data-rem="memo-off"><div class="rem-ico pink"><svg class="ico"><use href="#i-cake"/></svg></div><div class="rem-body"><b>到家纪念日</b><span>小白 · 提醒已关闭</span></div><span class="rem-tag ghost">已关闭</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ 我的 ============ -->
+        <div class="tab-screen" data-screen="mine">
+          <div class="statusbar"><span>9:41</span><span class="s-ico">📶 🔋</span></div>
+          <div class="header">
+            <div><div class="eyebrow">ME</div><div class="title">我的</div></div>
+            <div class="iconbtn" data-open="pg-settings"><svg class="ico"><use href="#i-gear"/></svg></div>
+          </div>
+          <div class="scroll">
+            <div class="profile" data-open="pg-pets-manage">
+              <img class="avatar" src="assets/moe/avatar-cat.jpg" alt="林小姐">
+              <div class="p-body"><b>林小姐的家</b><span>2 只毛孩子</span><span class="flag">🐾 铲屎官 Lv.1</span></div>
+              <svg class="ico sm chev"><use href="#i-chev-r"/></svg>
+            </div>
+
+            <div class="grid2">
+              <div class="gcell" data-open="pg-pets-manage"><span class="g-ico"><svg class="ico fill"><use href="#i-paw"/></svg></span><span>我的毛孩子</span></div>
+              <div class="gcell" data-open="pg-pet-photo"><span class="g-ico pink"><svg class="ico"><use href="#i-heart"/></svg></span><span>宠物照相馆</span></div>
+              <div class="gcell" data-open="pg-family"><span class="g-ico blue"><svg class="ico"><use href="#i-users"/></svg></span><span>家庭成员</span></div>
+              <div class="gcell" data-open="pg-health-ai"><span class="g-ico violet"><svg class="ico"><use href="#i-sparkle"/></svg></span><span>AI 健康档案</span></div>
+            </div>
+
+            <div class="menu">
+              <div class="menu-item" data-open="pg-member"><div class="m-ico amber"><svg class="ico"><use href="#i-star"/></svg></div><div class="m-body">会员订阅</div><span class="m-val">Lv.1</span><svg class="ico sm" style="color:#D8CCC0"><use href="#i-chev-r"/></svg></div>
+              <div class="menu-item" data-open="pg-export"><div class="m-ico"><svg class="ico"><use href="#i-file"/></svg></div><div class="m-body">档案导出</div><svg class="ico sm" style="color:#D8CCC0"><use href="#i-chev-r"/></svg></div>
+              <div class="menu-item" data-open="pg-todo"><div class="m-ico"><svg class="ico"><use href="#i-bell-heart"/></svg></div><div class="m-body">今日待办</div><svg class="ico sm" style="color:#D8CCC0"><use href="#i-chev-r"/></svg></div>
+              <div class="menu-item" data-open="pg-vet"><div class="m-ico"><svg class="ico"><use href="#i-location"/></svg></div><div class="m-body">附近宠物医院</div><svg class="ico sm" style="color:#D8CCC0"><use href="#i-chev-r"/></svg></div>
+              <div class="menu-item" data-open="pg-help"><div class="m-ico"><svg class="ico"><use href="#i-info"/></svg></div><div class="m-body">帮助与反馈</div><svg class="ico sm" style="color:#D8CCC0"><use href="#i-chev-r"/></svg></div>
+              <div class="menu-item" data-open="pg-about"><div class="m-ico"><svg class="ico fill"><use href="#i-paw"/></svg></div><div class="m-body">关于宠记</div><svg class="ico sm" style="color:#D8CCC0"><use href="#i-chev-r"/></svg></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：宠物档案 ============ -->
+        <div class="page" id="pg-pet-detail">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">宠物档案</div><div class="pact">编辑</div></div>
+          <div class="scroll">
+            <div class="mascot-hero card">
+              <div class="avatar-wrap">
+                <img id="pet-avatar" src="assets/moe/avatar-cat.jpg" alt="小白">
+                <div class="avatar-edit" id="avatar-edit-btn" title="更换头像"><svg class="ico"><use href="#i-camera"/></svg></div>
+              </div>
+              <b>小白</b><span>英国短毛猫 · 男生 · 2 岁 · 已绝育 · 生日 2024-03-15</span>
+              <div class="avatar-actions" id="avatar-actions">
+                <div class="va" id="ava-auto"><svg class="ico"><use href="#i-sparkle"/></svg><span>自动生成</span></div>
+                <div class="va alt" id="ava-upload"><svg class="ico"><use href="#i-image"/></svg><span>上传照片</span></div>
+              </div>
+              <input type="file" id="ava-file" accept="image/*" style="display:none">
+            </div>
+            <div class="section-head"><b>纪念日</b><span style="font-size:12px;color:var(--muted)">到期提醒</span></div>
+            <div class="card" style="padding:4px 14px">
+              <div class="rem-item"><div class="rem-ico pink"><svg class="ico"><use href="#i-cake"/></svg></div><div class="rem-body"><b>生日 🎂</b><span>2024-03-15 · 剩余 189 天</span></div><span class="switch on"></span></div>
+              <div class="rem-item"><div class="rem-ico amber"><svg class="ico"><use href="#i-memo"/></svg></div><div class="rem-body"><b>到家纪念日 🏠</b><span>2024-06-01 · 已陪伴 2 年</span></div><span class="switch"></span></div>
+              <div class="rem-item" data-open="pg-memo-add"><div class="rem-ico lav"><svg class="ico"><use href="#i-plus"/></svg></div><div class="rem-body"><b style="color:var(--lav)">添加纪念日</b><span>记录更多值得纪念的日子</span></div><svg class="ico sm chev"><use href="#i-chev-r"/></svg></div>
+            </div>
+            <div class="section-head"><b>健康概览</b></div>
+            <div class="card">
+              <div class="rem-item"><div class="rem-ico primary"><svg class="ico"><use href="#i-sparkle"/></svg></div><div class="rem-body"><b>养护指数</b><span>四维加权 · 良好</span></div><b style="font-size:20px;color:var(--primary)">88</b></div>
+              <div class="rem-item"><div class="rem-ico blue"><svg class="ico"><use href="#i-scale"/></svg></div><div class="rem-body"><b>体重</b><span>最近记录 4.2 kg</span></div><span class="rem-tag slate">标准</span></div>
+              <div class="rem-item"><div class="rem-ico amber"><svg class="ico"><use href="#i-droplet"/></svg></div><div class="rem-body"><b>下次驱虫</b><span>体内 · 11-30</span></div><span class="rem-tag amber">83 天</span></div>
+              <div class="rem-item"><div class="rem-ico teal"><svg class="ico"><use href="#i-medical"/></svg></div><div class="rem-body"><b>下次疫苗</b><span>狂犬 · 次年 6 月</span></div><span class="rem-tag green">已接种</span></div>
+            </div>
+            <div class="section-head"><b>AI 养护建议</b></div>
+            <div class="card" style="margin-bottom:12px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="ai-gen-tag"><svg class="ico xs"><use href="#i-sparkle"/></svg> 由 AI 生成</span></div>
+              <div class="plan-item"><div class="plan-chk on"><svg class="ico xs"><use href="#i-check"/></svg></div><div class="plan-body"><b>饮食 · 控制热量</b><p>英短易超重，建议每日 50g 优质猫粮 + 充足饮水。</p></div></div>
+              <div class="plan-item"><div class="plan-chk on"><svg class="ico xs"><use href="#i-check"/></svg></div><div class="plan-body"><b>运动 · 每天互动 15 分钟</b><p>英短运动量偏低，推荐逗猫棒活动预防肥胖。</p></div></div>
+              <div class="plan-item"><div class="plan-body"><b>体检 · 建议年度心脏超声</b><p>英短为心肌病高发品种，40% 患病率，建议定期筛查。</p></div></div>
+            </div>
+            <div style="display:flex;gap:10px">
+              <div class="btn btn-line" data-open="pg-care-ai">查看更多建议</div>
+              <div class="btn btn-mint" data-open="pg-report">生成报告卡</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：创建宠物档案（新用户引导） ============ -->
+        <div class="page" id="pg-onboarding">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">创建宠物档案</div><div class="pact" id="ob-skip">跳过</div></div>
+          <div class="scroll">
+            <div class="mascot-hero card" style="margin-bottom:14px">
+              <img id="ob-avatar" src="assets/moe/avatar-cat.jpg" alt="TA">
+              <b>给 TA 建个档案吧</b><span>第一步，先认识一下你的小宝贝</span>
+            </div>
+            <div class="field"><label>TA 的名字</label><input type="text" id="ob-name" placeholder="给它取个可爱的名字"></div>
+            <div class="field"><label>种类</label>
+              <div class="type-grid" style="grid-template-columns:repeat(2,1fr)">
+                <div class="cell on"><span class="ic coral" style="font-size:24px">🐱</span>猫咪</div>
+                <div class="cell"><span class="ic blue" style="font-size:24px">🐶</span>狗狗</div>
+              </div>
+            </div>
+            <div class="field"><label>品种</label><input type="text" id="ob-breed" placeholder="如：英国短毛猫"></div>
+            <div class="field"><label>性别</label>
+              <div class="type-grid" style="grid-template-columns:repeat(2,1fr)">
+                <div class="cell on"><span class="ic sky" style="font-size:22px">♂</span>男生</div>
+                <div class="cell"><span class="ic pink" style="font-size:22px">♀</span>女生</div>
+              </div>
+            </div>
+            <div class="field"><label>生日 / 年龄</label><input type="text" id="ob-birth" placeholder="如 2024-03-15"></div>
+            <div class="field"><label>体重</label><input type="text" id="ob-weight" placeholder="如 4.2 kg"></div>
+            <div class="btn btn-primary" style="margin-top:4px" id="create-pet-btn">完成创建 🐾</div>
+            <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:12px">创建后可随时在「我的毛孩子」里编辑</div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：当日详情 ============ -->
+        <div class="page" id="pg-day-detail">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle" id="day-title">9 月 2 日</div><div class="pact" data-open="pg-new-record">+ 记录</div></div>
+          <div class="scroll">
+            <div class="section-head"><b>待办事项</b></div>
+            <div class="card" id="day-todo-list" style="padding:4px 14px;margin-bottom:14px"></div>
+            <div class="section-head"><b>健康记录</b></div>
+            <div class="card" id="day-rec-list" style="padding:4px 14px"></div>
+            <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:14px">点日期即可查看当天全部待办与记录 🐾</div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：新建记录 ============ -->
+        <div class="page" id="pg-new-record">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">记一笔</div><div class="pact">保存</div></div>
+          <div class="scroll">
+            <div class="field"><label>关联宠物</label>
+              <div class="pet-switch" id="rec-pet-switch">
+                <div class="ps on" data-pet="cat"><img src="assets/moe/avatar-cat.jpg" alt="小白"><div style="flex:1"><div style="font-size:13px;font-weight:700">小白</div><span class="sp" style="display:block">英短 · 猫猫</span></div></div>
+                <div class="ps" data-pet="dog"><img src="assets/moe/avatar-dog.jpg" alt="豆豆"><div style="flex:1"><div style="font-size:13px;font-weight:700">豆豆</div><span class="sp" style="display:block">柯基 · 狗狗</span></div></div>
+              </div>
+            </div>
+
+            <div class="field"><label>记录分类</label>
+              <div class="type-group">
+                <div class="tg-label">基础健康<span class="n">驱虫 · 疫苗 · 体检 · 用药 · 体重</span></div>
+                <div class="type-grid">
+                  <div class="cell on"><span class="ic amber"><svg class="ico"><use href="#i-droplet"/></svg></span>驱虫</div>
+                  <div class="cell"><span class="ic teal"><svg class="ico"><use href="#i-medical"/></svg></span>疫苗</div>
+                  <div class="cell"><span class="ic blue"><svg class="ico"><use href="#i-clipcheck"/></svg></span>体检</div>
+                  <div class="cell"><span class="ic pink"><svg class="ico"><use href="#i-capsule"/></svg></span>用药</div>
+                  <div class="cell"><span class="ic slate"><svg class="ico"><use href="#i-scale"/></svg></span>体重</div>
+                </div>
+              </div>
+              <div class="type-group">
+                <div class="tg-label">清洁洗护<span class="n">根据宠物种类变化</span></div>
+                <div class="type-grid" id="groom-grid">
+                  <div class="cell"><span class="ic blue"><svg class="ico"><use href="#i-bath"/></svg></span>洗澡</div>
+                  <div class="cell"><span class="ic pink"><svg class="ico"><use href="#i-nail"/></svg></span>剪指甲</div>
+                  <div class="cell"><span class="ic teal"><svg class="ico"><use href="#i-tooth"/></svg></span>刷牙</div>
+                  <div class="cell anal-only"><span class="ic coral"><svg class="ico"><use href="#i-anal"/></svg></span>挤肛门腺</div>
+                </div>
+              </div>
+              <div class="type-group">
+                <div class="tg-label">打理清扫</div>
+                <div class="type-grid">
+                  <div class="cell"><span class="ic slate"><svg class="ico"><use href="#i-cage"/></svg></span>洗笼子</div>
+                  <div class="cell"><span class="ic amber"><svg class="ico"><use href="#i-bowl"/></svg></span>洗餐具</div>
+                  <div class="cell litter-only"><span class="ic slate"><svg class="ico"><use href="#i-litter"/></svg></span>换猫砂</div>
+                </div>
+              </div>
+              <div class="type-group">
+                <div class="tg-label">其他<span class="n">自定义</span></div>
+                <div class="type-grid">
+                  <div class="cell" id="new-cat-cell" data-open="pg-new-category"><span class="ic violet"><svg class="ico"><use href="#i-plus"/></svg></span>新建分类</div>
+                </div>
+              </div>
+            </div>
+            <div class="field"><label>标题</label><div class="mock" id="rec-title-mock">体内驱虫</div></div>
+            <div class="field"><label>详情备注</label><div class="mock"><span class="ph">记录下这次的情况吧…</span></div></div>
+            <div class="field"><label>发生时间</label><div class="mock">2026-09-06 <svg class="ico sm chev"><use href="#i-chev-r"/></svg></div></div>
+            <div class="section-head" style="margin:6px 4px 0"><b>智能录入</b><span class="ai-gen-tag"><svg class="ico xs"><use href="#i-sparkle"/></svg> AI</span></div>
+            <div class="quick" style="grid-template-columns:repeat(2,1fr)">
+              <div class="cell" data-open="pg-ocr"><span class="ic mint"><svg class="ico"><use href="#i-camera-ai"/></svg></span>拍照识别病历</div>
+              <div class="cell" data-open="pg-voice"><span class="ic lav"><svg class="ico"><use href="#i-mic"/></svg></span>语音录入</div>
+            </div>
+            <div class="btn btn-primary" style="margin-top:18px">保存记录</div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：新建分类 ============ -->
+        <div class="page" id="pg-new-category">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">新建分类</div><div class="pact">保存</div></div>
+          <div class="scroll">
+            <div class="field"><label>分类名称</label><div class="mock">遛狗<span class="ph" style="color:#CBBFB2;font-weight:500">例：遛狗、剃毛、梳毛、美容…</span></div></div>
+            <div class="field"><label>所属分组</label>
+              <div class="chiprow" id="cat-group-chips" style="margin:0;padding:0">
+                <div class="chip on">其他</div>
+                <div class="chip">清洁洗护</div>
+                <div class="chip">打理清扫</div>
+              </div>
+            </div>
+            <div class="field"><label>选择图标</label>
+              <div class="type-grid" style="grid-template-columns:repeat(4,1fr)">
+                <div class="cell on"><span class="ic coral"><svg class="ico"><use href="#i-paw"/></svg></span>爪爪</div>
+                <div class="cell"><span class="ic amber"><svg class="ico"><use href="#i-star"/></svg></span>星星</div>
+                <div class="cell"><span class="ic blue"><svg class="ico"><use href="#i-memo"/></svg></span>便签</div>
+                <div class="cell"><span class="ic pink"><svg class="ico"><use href="#i-heart"/></svg></span>爱心</div>
+                <div class="cell"><span class="ic teal"><svg class="ico"><use href="#i-tooth"/></svg></span>牙刷</div>
+                <div class="cell"><span class="ic slate"><svg class="ico"><use href="#i-capsule"/></svg></span>胶囊</div>
+                <div class="cell"><span class="ic coral"><svg class="ico"><use href="#i-clock"/></svg></span>时钟</div>
+                <div class="cell"><span class="ic violet"><svg class="ico"><use href="#i-sparkle"/></svg></span>星光</div>
+              </div>
+            </div>
+            <div class="btn btn-primary" style="margin-top:18px">创建分类</div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：添加纪念日 ============ -->
+        <div class="page" id="pg-memo-add">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">添加纪念日</div><div class="pact">保存</div></div>
+          <div class="scroll">
+            <div class="field"><label>纪念日名称</label><div class="mock">生日<span></span></div></div>
+            <div class="field"><label>日期</label><div class="mock">2024-03-15 <svg class="ico sm chev"><use href="#i-chev-r"/></svg></div></div>
+            <div class="field"><label>关联宠物</label><div class="mock" style="justify-content:flex-start;gap:8px"><img src="assets/moe/avatar-cat.jpg" style="width:24px;height:24px;border-radius:50%;object-fit:cover">小白 <span style="flex:1"></span><svg class="ico sm chev"><use href="#i-chev-r"/></svg></div></div>
+            <div class="field" style="display:flex;align-items:center;justify-content:space-between"><div><label style="margin:0">增加提醒</label><div style="font-size:11.5px;color:var(--muted);margin-top:3px">纪念日到期前提醒我</div></div><span class="switch on" id="memo-rem-switch"></span></div>
+            <div class="field" id="memo-rem-time"><label>提醒时间</label>
+              <div class="chiprow" id="memo-rem-time-chips" style="margin:0;padding:0">
+                <div class="chip">当天</div><div class="chip">提前 1 天</div><div class="chip on">提前 3 天</div><div class="chip">提前 7 天</div>
+              </div>
+            </div>
+            <div class="field" id="memo-rem-repeat"><label>重复周期</label>
+              <div class="chiprow" id="memo-rem-repeat-chips" style="margin:0;padding:0">
+                <div class="chip on">每年</div><div class="chip">每年农历</div><div class="chip">每月</div><div class="chip">仅一次</div>
+              </div>
+            </div>
+            <div class="btn btn-primary" style="margin-top:18px">保存纪念日</div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：记录详情 ============ -->
+        <div class="page" id="pg-record-detail">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">记录详情</div><div class="pact">编辑</div></div>
+          <div class="scroll">
+            <div class="card" style="margin-bottom:12px">
+              <div style="display:flex;align-items:center;gap:12px">
+                <div class="t-ico amber"><svg class="ico"><use href="#i-droplet"/></svg></div>
+                <div style="flex:1"><b style="font-size:16px">体内驱虫</b><div style="font-size:12px;color:var(--muted);margin-top:2px">2026-06-05 · 小白</div></div>
+                <span class="rem-tag green">已完成</span>
+              </div>
+            </div>
+            <div class="card" style="margin-bottom:12px">
+              <div class="field" style="margin-bottom:0;border:none;padding:6px 0"><label>药品</label><div class="mock">海乐妙（犬猫通用）</div></div>
+              <div class="field" style="margin-bottom:0;border:none;padding:6px 0"><label>剂量</label><div class="mock">1 片 / 4kg</div></div>
+              <div class="field" style="margin-bottom:0;border:none;padding:6px 0"><label>下次驱虫</label><div class="mock">2026-11-30</div></div>
+            </div>
+            <div class="card" style="margin-bottom:12px">
+              <div style="font-size:13px;font-weight:800;margin-bottom:8px">备注</div>
+              <div style="font-size:13px;color:var(--text);line-height:1.6">小白最近精神很好，体重稳定。驱虫后观察 24 小时无异常。</div>
+            </div>
+            <div class="btn btn-line" style="color:var(--danger)">删除记录</div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：新建提醒 ============ -->
+        <div class="page" id="pg-new-reminder">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">新建提醒</div><div class="pact"></div></div>
+          <div class="scroll">
+            <div class="field"><label>提醒事项</label>
+              <input class="rem-input" id="rem-title-input" type="text" placeholder="比如：体内驱虫、狂犬疫苗、洗澡…">
+            </div>
+            <div class="field"><label>关联宠物</label>
+              <div class="pet-select" id="rem-pet-select">
+                <div class="pet-card on" data-pet="cat" data-name="小白"><img src="assets/moe/avatar-cat.jpg" alt="小白"><div class="pc-body"><b>小白</b></div><div class="pc-check"><svg class="ico"><use href="#i-check"/></svg></div></div>
+                <div class="pet-card" data-pet="dog" data-name="豆豆"><img src="assets/moe/avatar-dog.jpg" alt="豆豆"><div class="pc-body"><b>豆豆</b></div><div class="pc-check"><svg class="ico"><use href="#i-check"/></svg></div></div>
+              </div>
+            </div>
+            <div class="field"><label>日期</label>
+              <div class="opt-group" id="rem-date-group">
+                <span class="opt-chip on" data-val="今天">今天</span>
+                <span class="opt-chip" data-val="明天">明天</span>
+                <span class="opt-chip" data-val="3 天后">3 天后</span>
+                <span class="opt-chip" data-val="1 周后">1 周后</span>
+                <span class="opt-chip" data-val="自选日期">自选…</span>
+              </div>
+            </div>
+            <div class="field"><label>重复</label>
+              <div class="opt-group" id="rem-repeat-group">
+                <span class="opt-chip" data-val="不重复">不重复</span>
+                <span class="opt-chip" data-val="每周">每周</span>
+                <span class="opt-chip" data-val="每月">每月</span>
+                <span class="opt-chip on" data-val="每 3 个月">每 3 个月</span>
+                <span class="opt-chip" data-val="每年">每年</span>
+              </div>
+            </div>
+            <div class="field"><label>提前提醒</label>
+              <div class="opt-group" id="rem-ahead-group">
+                <span class="opt-chip" data-val="当天">当天</span>
+                <span class="opt-chip on" data-val="提前 1 天">提前 1 天</span>
+                <span class="opt-chip" data-val="提前 3 天">提前 3 天</span>
+                <span class="opt-chip" data-val="提前 7 天">提前 7 天</span>
+              </div>
+            </div>
+            <div class="btn btn-primary" id="create-reminder-btn" style="margin-top:18px">创建提醒</div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：AI 智能规划 ============ -->
+        <div class="page" id="pg-plan-ai">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">AI 智能规划</div><div class="pact" id="plan-regen-btn" style="color:var(--lav)">重新生成</div></div>
+          <div class="scroll">
+            <div id="ai-loading" class="ai-loading" style="display:none"><i></i><i></i><i></i><span>AI 正在分析小白的档案…</span></div>
+            <div id="plan-content">
+              <div class="mascot-hero card" style="margin-bottom:14px">
+                <img src="assets/moe/mascot.jpg" alt="AI 吉祥物">
+                <b>为「小白」定制了这个月的计划 🐾</b>
+                <span>基于英短品种 · 夏季 · 历史档案生成</span>
+              </div>
+              <div class="section-head" style="margin-top:2px"><b>本月建议</b><span class="ai-gen-tag"><svg class="ico xs"><use href="#i-sparkle"/></svg> AI</span></div>
+              <div class="plan-item"><div class="plan-chk on"><svg class="ico xs"><use href="#i-check"/></svg></div><div class="plan-body"><b>7 天内 · 体内驱虫</b><p>上次 6/5，已超 3 个月，建议尽快补驱虫，药品海乐妙。</p></div></div>
+              <div class="plan-item"><div class="plan-chk"><svg class="ico xs"><use href="#i-check"/></svg></div><div class="plan-body"><b>10 天内 · 狂犬疫苗</b><p>年度接种到期，建议预约附近医院。</p></div></div>
+              <div class="plan-item"><div class="plan-chk"><svg class="ico xs"><use href="#i-check"/></svg></div><div class="plan-body"><b>本季 · 控制体重</b><p>夏季活动量下降，当前 4.2kg，注意热量摄入。</p></div></div>
+              <div class="plan-item"><div class="plan-chk"><svg class="ico xs"><use href="#i-check"/></svg></div><div class="plan-body"><b>本季 · 耳朵清洁</b><p>英短耳道易藏污垢，建议每周用宠物耳液清洁。</p></div></div>
+              <div class="btn btn-primary" id="plan-commit-btn" style="margin-top:16px">一键加入提醒日历</div>
+              <div class="ai-note"><svg class="ico xs" style="color:var(--muted)"><use href="#i-info"/></svg><span>AI 建议仅供参考，不替代专业兽医诊断。如有异常请及时就医。</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：能吃啥 ============ -->
+        <div class="page" id="pg-food-scan">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">能吃啥</div><div class="pact">速查表</div></div>
+          <div class="scroll">
+            <div class="food-hero">
+              <div style="font-size:12px;opacity:.92;font-weight:600">食物 / 品牌速查</div>
+              <div style="font-size:20px;font-weight:800;margin-top:3px">狗狗能吃葡萄吗？</div>
+              <div class="food-search"><svg class="ico sm"><use href="#i-search"/></svg> 搜食物名或品牌名…</div>
+            </div>
+            <div class="quick-food">
+              <div class="cf">🍇 葡萄</div><div class="cf">🍗 鸡胸肉</div><div class="cf">🥛 牛奶</div><div class="cf">🐱 皇家K36</div><div class="cf">📷 拍配料表</div>
+            </div>
+            <div class="section-head"><b>常见食物速查</b></div>
+            <div class="card" style="padding:4px 16px">
+              <div class="food-row"><div class="food-name">鸡胸肉</div><div class="food-s"><span class="dot g"></span>可以吃</div></div>
+              <div class="food-row"><div class="food-name">胡萝卜</div><div class="food-s"><span class="dot g"></span>可以吃</div></div>
+              <div class="food-row"><div class="food-name">牛奶</div><div class="food-s"><span class="dot y"></span>需注意</div></div>
+              <div class="food-row"><div class="food-name">巧克力</div><div class="food-s"><span class="dot r"></span>不能吃</div></div>
+              <div class="food-row"><div class="food-name">葡萄</div><div class="food-s"><span class="dot r"></span>不能吃</div></div>
+            </div>
+            <div class="section-head"><b>常见犬猫粮营养</b></div>
+            <div class="card">
+              <div class="rem-item"><div class="rem-ico lav"><svg class="ico"><use href="#i-star"/></svg></div><div class="rem-body"><b>皇家 K36</b><span>幼猫粮 · 蛋白质覆盖 92%</span></div><span class="rem-tag green">推荐</span></div>
+              <div class="rem-item"><div class="rem-ico lav"><svg class="ico"><use href="#i-star"/></svg></div><div class="rem-body"><b>渴望六种鱼</b><span>成猫粮 · 蛋白质覆盖 88%</span></div><span class="rem-tag green">推荐</span></div>
+            </div>
+            <div class="ai-note"><svg class="ico xs" style="color:var(--muted)"><use href="#i-info"/></svg><span>「能不能吃」结果仅供参考，如宠物误食有毒食物请立即就医。</span></div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：宠物照相馆 ============ -->
+        <div class="page" id="pg-pet-photo">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">宠物照相馆</div><div class="pact">相册</div></div>
+          <div class="scroll">
+            <div class="photo-preview" id="photo-preview">
+              <img id="photo-preview-img" src="assets/moe/avatar-dog.jpg" alt="预览">
+              <span class="pp-frame" id="pp-frame">爱心主题</span>
+            </div>
+            <div class="section-head"><b>主题模板</b></div>
+            <div class="type-grid" id="photo-themes">
+              <div class="cell on" data-theme="爱心"><span class="ic pink"><svg class="ico"><use href="#i-heart"/></svg></span>爱心</div>
+              <div class="cell" data-theme="生日"><span class="ic amber"><svg class="ico"><use href="#i-star"/></svg></span>生日</div>
+              <div class="cell" data-theme="清爽"><span class="ic blue"><svg class="ico"><use href="#i-camera"/></svg></span>清爽</div>
+              <div class="cell" data-theme="爪爪"><span class="ic teal"><svg class="ico fill"><use href="#i-paw"/></svg></span>爪爪</div>
+              <div class="cell" data-theme="复古"><span class="ic slate"><svg class="ico"><use href="#i-image"/></svg></span>复古</div>
+              <div class="cell" data-theme="梦幻"><span class="ic coral"><svg class="ico"><use href="#i-sparkle"/></svg></span>梦幻</div>
+            </div>
+            <div class="btn btn-primary" id="photo-shoot" style="margin-top:18px"><svg class="ico"><use href="#i-camera"/></svg> 拍一张 / 选一张</div>
+            <input type="file" id="photo-file" accept="image/*" style="display:none">
+            <div class="btn btn-line" id="photo-share" style="margin-top:10px"><svg class="ico"><use href="#i-share"/></svg> 生成分享图</div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：消息通知 ============ -->
+        <div class="page" id="pg-notify">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">消息通知</div><div class="pact">全部已读</div></div>
+          <div class="scroll">
+            <div class="card" style="padding:4px 14px">
+              <div class="rem-item"><div class="rem-ico lav"><svg class="ico"><use href="#i-sparkle"/></svg></div><div class="rem-body"><b>AI 养护建议已更新</b><span>小白本周养护指数 +2</span></div><span class="rem-tag slate">30 分钟前</span></div>
+              <div class="rem-item"><div class="rem-ico blue"><svg class="ico"><use href="#i-users"/></svg></div><div class="rem-body"><b>家人加入了共享</b><span>张先生成为了「小白」的家人</span></div><span class="rem-tag slate">昨天</span></div>
+              <div class="rem-item"><div class="rem-ico mint"><svg class="ico"><use href="#i-file"/></svg></div><div class="rem-body"><b>本周趋势报告已生成</b><span>体重稳定，驱虫提醒 1 项</span></div><span class="rem-tag slate">3 天前</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：体重记录 ============ -->
+        <div class="page" id="pg-weight">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">体重记录</div><div class="pact" data-open="pg-new-record">记一笔</div></div>
+          <div class="scroll">
+            <div class="mascot-hero card" style="margin-bottom:14px">
+              <img src="assets/moe/avatar-cat.jpg" alt="小白">
+              <b>4.2 kg</b><span>小白 · 较上月 +0.1 kg · 标准范围</span>
+            </div>
+            <div class="section-head"><b>历史记录</b></div>
+            <div class="card" style="padding:4px 14px">
+              <div class="rem-item"><div class="rem-ico blue"><svg class="ico"><use href="#i-scale"/></svg></div><div class="rem-body"><b>4.2 kg</b><span>2026-09-06 · 稳定</span></div><span class="rem-tag slate">最新</span></div>
+              <div class="rem-item"><div class="rem-ico blue"><svg class="ico"><use href="#i-scale"/></svg></div><div class="rem-body"><b>4.1 kg</b><span>2026-08-02 · 稳定</span></div><span class="rem-tag slate">持平</span></div>
+              <div class="rem-item"><div class="rem-ico blue"><svg class="ico"><use href="#i-scale"/></svg></div><div class="rem-body"><b>4.0 kg</b><span>2026-07-05 · 正常</span></div><span class="rem-tag green">+0.1</span></div>
+              <div class="rem-item"><div class="rem-ico blue"><svg class="ico"><use href="#i-scale"/></svg></div><div class="rem-body"><b>3.9 kg</b><span>2026-06-01 · 略轻</span></div><span class="rem-tag green">+0.1</span></div>
+            </div>
+            <div class="ai-note"><svg class="ico xs" style="color:var(--muted)"><use href="#i-info"/></svg><span>英短成年公猫健康体重区间 3.8–4.5 kg。</span></div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：AI 估体况 ============ -->
+        <div class="page" id="pg-photo-bcs">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">AI 估体况</div><div class="pact">帮助</div></div>
+          <div class="scroll">
+            <div class="mascot-hero card" style="margin-bottom:14px">
+              <img id="bcs-photo" src="assets/moe/avatar-dog.jpg" alt="估体况">
+              <b>拍张侧面全身照</b><span>AI 通过体型判断体况指数（BCS）</span>
+            </div>
+            <div class="section-head"><b>本月评测</b></div>
+            <div class="card" style="margin-bottom:12px">
+              <div class="rem-item"><div class="rem-ico ok"><svg class="ico"><use href="#i-camera-ai"/></svg></div><div class="rem-body"><b>体况指数 BCS</b><span>9 级评分 · 5 为理想</span></div><b id="bcs-score" style="font-size:20px;color:var(--mint)">5/9</b></div>
+              <div class="rem-item"><div class="rem-ico ok"><svg class="ico"><use href="#i-scale"/></svg></div><div class="rem-body"><b>理想体重</b><span>当前 4.2 kg</span></div><span class="rem-tag green">理想</span></div>
+            </div>
+            <div class="btn btn-primary" id="bcs-shoot"><svg class="ico"><use href="#i-camera"/></svg> 拍摄 / 上传照片</div>
+            <input type="file" id="bcs-file" accept="image/*" style="display:none">
+            <div class="btn btn-line" id="bcs-std-btn" style="margin-top:10px">查看体况评分标准</div>
+            <div class="card bcs-panel" id="bcs-panel" style="display:none">
+              <div class="bcs-row"><span class="bcs-num">1</span><b>极度消瘦</b><span>肋骨·脊柱·骨盆突出，无体脂</span></div>
+              <div class="bcs-row"><span class="bcs-num">2</span><b>很瘦</b><span>肋骨易见，腰线明显</span></div>
+              <div class="bcs-row"><span class="bcs-num">3</span><b>偏瘦</b><span>肋骨易摸到，轻微脂肪覆盖</span></div>
+              <div class="bcs-row"><span class="bcs-num">4</span><b>略瘦</b><span>肋沟可见，明显腰线</span></div>
+              <div class="bcs-row"><span class="bcs-num">5</span><b>理想</b><span>肋骨薄脂肪覆盖，比例协调</span></div>
+              <div class="bcs-row"><span class="bcs-num">6</span><b>略胖</b><span>肋骨稍难摸到，腰线不明显</span></div>
+              <div class="bcs-row"><span class="bcs-num">7</span><b>偏胖</b><span>肋骨难摸到，明显脂肪堆积</span></div>
+              <div class="bcs-row"><span class="bcs-num">8</span><b>肥胖</b><span>肋骨难摸到，无腰线</span></div>
+              <div class="bcs-row"><span class="bcs-num">9</span><b>重度肥胖</b><span>大量脂肪，无法摸到肋骨</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：找医院 ============ -->
+        <div class="page" id="pg-vet">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">找医院</div><div class="pact">地图</div></div>
+          <div class="scroll">
+            <div class="food-hero">
+              <div style="font-size:12px;opacity:.92;font-weight:600">附近宠物医院</div>
+              <div style="font-size:20px;font-weight:800;margin-top:3px">为小白找靠谱医院</div>
+              <div class="food-search"><svg class="ico sm"><use href="#i-location"/></svg> 定位：上海市 · 徐汇区</div>
+            </div>
+            <div class="section-head"><b>推荐医院</b><span style="font-size:12px;color:var(--muted)">按距离</span></div>
+            <div class="card" style="padding:4px 14px">
+              <div class="rem-item"><div class="rem-ico primary"><svg class="ico"><use href="#i-location"/></svg></div><div class="rem-body"><b>宠爱国际动物医院</b><span>综合 · 24 小时 · 4.9 分</span></div><span class="rem-tag green">1.2 km</span></div>
+              <div class="rem-item"><div class="rem-ico primary"><svg class="ico"><use href="#i-location"/></svg></div><div class="rem-body"><b>瑞鹏宠物医院（徐汇店）</b><span>已接入档案 · 4.8 分</span></div><span class="rem-tag slate">2.4 km</span></div>
+              <div class="rem-item"><div class="rem-ico primary"><svg class="ico"><use href="#i-location"/></svg></div><div class="rem-body"><b>芭比堂动物医院</b><span>心脏专科 · 4.7 分</span></div><span class="rem-tag slate">3.1 km</span></div>
+            </div>
+            <div class="btn btn-line" style="margin-top:14px"><svg class="ico"><use href="#i-location"/></svg> 打开地图导航</div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：今日待办 ============ -->
+        <div class="page" id="pg-todo">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">今日待办</div><div class="pact" data-open="pg-new-reminder">新增</div></div>
+          <div class="scroll">
+            <div class="section-head"><b>逾期</b><span style="font-size:12px;color:var(--danger)">1 项</span></div>
+            <div class="card" style="padding:4px 14px;margin-bottom:6px">
+              <div class="rem-item" data-rem="deworm-in" data-open="pg-handle"><div class="rem-ico primary"><svg class="ico"><use href="#i-droplet"/></svg></div><div class="rem-body"><b>体内驱虫</b><span>小白 · 已超 7 天，点此处理</span></div><span class="rem-tag red">已逾期 · 7天</span></div>
+            </div>
+            <div class="section-head"><b>即将到期</b></div>
+            <div class="card" style="padding:4px 14px">
+              <div class="rem-item" data-rem="vaccine" data-open="pg-reminder-detail"><div class="rem-ico blue"><svg class="ico"><use href="#i-medical"/></svg></div><div class="rem-body"><b>狂犬疫苗</b><span>小白 · 每年接种</span></div><span class="rem-tag amber">3 天后</span></div>
+              <div class="rem-item" data-rem="checkup" data-open="pg-reminder-detail"><div class="rem-ico ok"><svg class="ico"><use href="#i-clipcheck"/></svg></div><div class="rem-body"><b>年度体检</b><span>小白 · 每年一次</span></div><span class="rem-tag blue">已预约</span></div>
+              <div class="rem-item" data-rem="deworm-out" data-open="pg-reminder-detail"><div class="rem-ico primary"><svg class="ico"><use href="#i-clock"/></svg></div><div class="rem-body"><b>外用驱虫</b><span>小白 · 每月 1 日</span></div><span class="rem-tag slate">进行中</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：处理提醒 ============ -->
+        <div class="page" id="pg-handle">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">处理提醒</div><div class="pact"></div></div>
+          <div class="scroll">
+            <div class="mascot-hero card" style="margin-bottom:14px">
+              <img src="assets/moe/avatar-cat.jpg" alt="小白">
+              <b>体内驱虫 · 已超 7 天</b><span>上次完成于 2026-06-05</span>
+            </div>
+            <div class="section-head"><b>这次做了什么</b></div>
+            <div class="type-grid">
+              <div class="cell on"><span class="ic amber"><svg class="ico"><use href="#i-droplet"/></svg></span>体内驱虫</div>
+              <div class="cell"><span class="ic teal"><svg class="ico"><use href="#i-medical"/></svg></span>打了疫苗</div>
+              <div class="cell"><span class="ic blue"><svg class="ico"><use href="#i-clipcheck"/></svg></span>做了体检</div>
+              <div class="cell"><span class="ic pink"><svg class="ico"><use href="#i-capsule"/></svg></span>用其它药</div>
+            </div>
+            <div class="field" style="margin-top:12px"><label>药品</label><div class="mock">海乐妙（犬猫通用）</div></div>
+            <div class="field"><label>处理时间</label><div class="mock">2026-09-07 <svg class="ico sm chev"><use href="#i-chev-r"/></svg></div></div>
+            <div class="btn btn-primary" style="margin-top:18px" id="handle-submit">标记为已处理</div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：疫苗预约 ============ -->
+        <div class="page" id="pg-book">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">疫苗预约</div><div class="pact"></div></div>
+          <div class="scroll">
+            <div class="mascot-hero card" style="margin-bottom:14px">
+              <img src="assets/moe/avatar-cat.jpg" alt="小白">
+              <b>狂犬疫苗 · 年度接种</b><span>3 天后到期 · 建议尽快预约</span>
+            </div>
+            <div class="field"><label>医院</label><div class="mock">宠爱国际动物医院 <svg class="ico sm chev"><use href="#i-chev-r"/></svg></div></div>
+            <div class="field"><label>日期</label><div class="mock">2026-09-10 <svg class="ico sm chev"><use href="#i-chev-r"/></svg></div></div>
+            <div class="field"><label>时段</label><div class="mock">上午 10:00 <svg class="ico sm chev"><use href="#i-chev-r"/></svg></div></div>
+            <div class="field"><label>关联宠物</label><div class="mock"><span style="display:flex;align-items:center;gap:8px"><img src="assets/moe/avatar-cat.jpg" style="width:24px;height:24px;border-radius:50%;object-fit:cover">小白</span></div></div>
+            <div class="btn btn-primary" style="margin-top:18px">确认预约</div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：搜索 ============ -->
+        <div class="page" id="pg-search">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">搜索</div><div class="pact"></div></div>
+          <div class="scroll">
+            <div class="food-search" style="margin-top:4px"><svg class="ico sm"><use href="#i-search"/></svg> 搜索记录、药品、笔记…</div>
+            <div class="section-head"><b>最近搜索</b></div>
+            <div class="quick-food">
+              <div class="cf">驱虫</div><div class="cf">疫苗</div><div class="cf">体重</div><div class="cf">海乐妙</div><div class="cf">体检</div>
+            </div>
+            <div class="section-head"><b>热门搜索</b></div>
+            <div class="quick-food">
+              <div class="cf">狂犬疫苗</div><div class="cf">耳螨</div><div class="cf">猫三联</div><div class="cf">益生菌</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：提醒详情 ============ -->
+        <div class="page" id="pg-reminder-detail">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">提醒详情</div><div class="pact" id="rd-edit">编辑</div></div>
+          <div class="scroll">
+            <div class="card" style="margin-bottom:12px">
+              <div style="display:flex;align-items:center;gap:12px">
+                <div class="t-ico amber"><svg class="ico"><use href="#i-droplet"/></svg></div>
+                <div style="flex:1"><b style="font-size:16px" id="rd-title">体内驱虫</b><div style="font-size:12px;color:var(--muted);margin-top:2px" id="rd-sub">小白 · 每 3 个月</div></div>
+                <span class="rem-tag red" id="rd-status">已逾期</span>
+              </div>
+            </div>
+            <div class="card" style="margin-bottom:12px">
+              <div class="field" style="margin-bottom:0;border:none;padding:10px 4px">
+                <label>提醒事项</label>
+                <input class="rem-input rd-field" data-field="title" type="text" readonly value="体内驱虫">
+              </div>
+              <div class="field" style="margin-bottom:0;border:none;padding:10px 4px">
+                <label>下次提醒</label>
+                <input class="rem-input rd-field" data-field="next" type="text" readonly value="2026-09-07（已超 7 天）">
+              </div>
+              <div class="field" style="margin-bottom:0;border:none;padding:10px 4px">
+                <label>重复</label>
+                <input class="rem-input rd-field" data-field="repeat" type="text" readonly value="每 3 个月">
+              </div>
+              <div class="field" style="margin-bottom:0;border:none;padding:10px 4px">
+                <label>提前提醒</label>
+                <input class="rem-input rd-field" data-field="ahead" type="text" readonly value="提前 7 天 + 1 天">
+              </div>
+            </div>
+            <div class="btn btn-primary" id="rd-done">标记完成</div>
+            <div class="btn btn-line" style="margin-top:10px;color:var(--danger)" id="rd-delete">删除提醒</div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：设置 ============ -->
+        <div class="page" id="pg-settings">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">设置</div><div class="pact"></div></div>
+          <div class="scroll">
+            <div class="menu">
+              <div class="menu-item"><div class="m-ico"><svg class="ico"><use href="#i-bell"/></svg></div><div class="m-body">通知提醒</div><span class="m-val">已开启</span><svg class="ico sm" style="color:#D8CCC0"><use href="#i-chev-r"/></svg></div>
+              <div class="menu-item"><div class="m-ico"><svg class="ico"><use href="#i-moon"/></svg></div><div class="m-body">深色模式</div><span class="m-val">跟随系统</span><svg class="ico sm" style="color:#D8CCC0"><use href="#i-chev-r"/></svg></div>
+              <div class="menu-item"><div class="m-ico"><svg class="ico"><use href="#i-users"/></svg></div><div class="m-body">家人共享</div><span class="m-val">2 人</span><svg class="ico sm" style="color:#D8CCC0"><use href="#i-chev-r"/></svg></div>
+              <div class="menu-item"><div class="m-ico"><svg class="ico"><use href="#i-shield"/></svg></div><div class="m-body">隐私与数据</div><svg class="ico sm" style="color:#D8CCC0"><use href="#i-chev-r"/></svg></div>
+            </div>
+            <div class="menu" style="margin-top:14px">
+              <div class="menu-item"><div class="m-ico amber"><svg class="ico"><use href="#i-file"/></svg></div><div class="m-body">清除缓存</div><span class="m-val">12.4 MB</span><svg class="ico sm" style="color:#D8CCC0"><use href="#i-chev-r"/></svg></div>
+              <div class="menu-item"><div class="m-ico"><svg class="ico"><use href="#i-info"/></svg></div><div class="m-body">退出登录</div><svg class="ico sm" style="color:#D8CCC0"><use href="#i-chev-r"/></svg></div>
+            </div>
+            <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:20px">宠记 PetLog · v1.0.0</div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：我的毛孩子 ============ -->
+        <div class="page" id="pg-pets-manage">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">我的毛孩子</div><div class="pact">+ 添加</div></div>
+          <div class="scroll">
+            <div class="card" style="margin-bottom:12px" data-open="pg-pet-detail">
+              <div style="display:flex;align-items:center;gap:12px">
+                <img src="assets/moe/avatar-cat.jpg" style="width:56px;height:56px;border-radius:18px;object-fit:cover">
+                <div style="flex:1"><b style="font-size:16px">小白</b><div style="font-size:12px;color:var(--muted);margin-top:2px">英国短毛猫 · 男生 · 2 岁</div></div>
+                <span class="rem-tag green">当前</span>
+                <svg class="ico sm chev"><use href="#i-chev-r"/></svg>
+              </div>
+            </div>
+            <div class="card" data-open="pg-pet-detail">
+              <div style="display:flex;align-items:center;gap:12px">
+                <img src="assets/moe/avatar-dog.jpg" style="width:56px;height:56px;border-radius:18px;object-fit:cover">
+                <div style="flex:1"><b style="font-size:16px">豆豆</b><div style="font-size:12px;color:var(--muted);margin-top:2px">柯基 · 男生 · 1 岁</div></div>
+                <svg class="ico sm chev"><use href="#i-chev-r"/></svg>
+              </div>
+            </div>
+            <div class="btn btn-line" style="margin-top:14px"><svg class="ico"><use href="#i-plus"/></svg> 添加新宠物</div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：家庭成员 ============ -->
+        <div class="page" id="pg-family">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">家庭成员</div><div class="pact">邀请</div></div>
+          <div class="scroll">
+            <div class="card" style="padding:4px 14px">
+              <div class="rem-item"><img src="assets/moe/avatar-cat.jpg" style="width:42px;height:42px;border-radius:14px;object-fit:cover"><div class="rem-body"><b>林小姐（我）</b><span>管理员 · 负责日常喂养</span></div><span class="rem-tag slate">管理员</span></div>
+              <div class="rem-item"><img src="assets/moe/avatar-dog.jpg" style="width:42px;height:42px;border-radius:14px;object-fit:cover"><div class="rem-body"><b>张先生</b><span>家人 · 负责遛狗与体检</span></div><span class="rem-tag green">家人</span></div>
+              <div class="rem-item"><img src="assets/moe/welcome.jpg" style="width:42px;height:42px;border-radius:14px;object-fit:cover"><div class="rem-body"><b>陈女士</b><span>暂未接受邀请</span></div><span class="rem-tag amber">待接受</span></div>
+            </div>
+            <div class="btn btn-line" style="margin-top:14px"><svg class="ico"><use href="#i-users"/></svg> 邀请家人共同照顾</div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：AI 健康档案 ============ -->
+        <div class="page" id="pg-health-ai">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">AI 健康档案</div><div class="pact" id="health-gen-btn">生成</div></div>
+          <div class="scroll">
+            <div class="mascot-hero card" style="margin-bottom:14px">
+              <img src="assets/moe/mascot.jpg" alt="AI">
+              <b>小白 · 数字健康档案</b><span>由 AI 自动整理 · 实时更新</span>
+            </div>
+            <div class="section-head"><b>健康摘要</b><span class="ai-gen-tag"><svg class="ico xs"><use href="#i-sparkle"/></svg> AI</span></div>
+            <div class="card" style="margin-bottom:12px;padding:4px 14px">
+              <div class="rem-item" data-expand="health-rating-detail"><div class="rem-ico primary"><svg class="ico"><use href="#i-sparkle"/></svg></div><div class="rem-body"><b>综合评级</b><span>四维养护 · 良好</span></div><b style="font-size:20px;color:var(--primary)">88</b></div>
+              <div class="exp" id="health-rating-detail" style="display:none">
+                <div class="exp-row"><span>体重</span><b>4.2 kg · 标准</b><em class="ok">良好</em></div>
+                <div class="exp-row"><span>驱虫</span><b>已逾期 7 天</b><em class="warn">需处理</em></div>
+                <div class="exp-row"><span>疫苗</span><b>已接种</b><em class="ok">良好</em></div>
+                <div class="exp-row"><span>活动</span><b>精神活泼</b><em class="ok">正常</em></div>
+              </div>
+              <div class="rem-item" data-expand="health-risk-detail"><div class="rem-ico warn"><svg class="ico"><use href="#i-droplet"/></svg></div><div class="rem-body"><b>风险项</b><span>驱虫逾期 · 1 项</span></div><span class="rem-tag amber">需处理</span></div>
+              <div class="exp" id="health-risk-detail" style="display:none">体内驱虫已超 7 天，建议尽快补做海乐妙，并记录到提醒日历。</div>
+              <div class="rem-item" data-expand="health-trend-detail"><div class="rem-ico ok"><svg class="ico"><use href="#i-heart"/></svg></div><div class="rem-body"><b>近期趋势</b><span>体重稳定 · 活动正常</span></div><span class="rem-tag green">健康</span></div>
+              <div class="exp" id="health-trend-detail" style="display:none">近 6 个月体重 3.9→4.2kg 稳步上升，活动量正常；驱虫 1 项逾期需关注。</div>
+            </div>
+            <div class="section-head"><b>档案明细</b></div>
+            <div class="card" style="padding:4px 14px">
+              <div class="rem-item" data-detail="疫苗记录：狂犬（已接种）· 猫三联（已接种）"><div class="rem-body"><b>疫苗记录</b><span>狂犬（已接种）· 猫三联（已接种）</span></div><svg class="ico sm chev"><use href="#i-chev-r"/></svg></div>
+              <div class="rem-item" data-detail="体检报告：年度体检 · 无异常"><div class="rem-body"><b>体检报告</b><span>年度体检 · 无异常</span></div><svg class="ico sm chev"><use href="#i-chev-r"/></svg></div>
+              <div class="rem-item" data-detail="用药记录：益生菌 · 耳螨药"><div class="rem-body"><b>用药记录</b><span>益生菌 · 耳螨药</span></div><svg class="ico sm chev"><use href="#i-chev-r"/></svg></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：会员订阅 ============ -->
+        <div class="page" id="pg-member">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">会员订阅</div><div class="pact"></div></div>
+          <div class="scroll">
+            <div class="profile">
+              <img class="avatar" src="assets/moe/avatar-cat.jpg" alt="会员">
+              <div class="p-body"><b>铲屎官 Lv.1</b><span>当前订阅 · 免费版</span></div>
+              <span class="flag">🐾 Lv.1</span>
+            </div>
+            <div class="section-head"><b>升级后尊享</b></div>
+            <div class="card" style="padding:4px 14px">
+              <div class="rem-item"><div class="rem-ico primary"><svg class="ico"><use href="#i-sparkle"/></svg></div><div class="rem-body"><b>无限 AI 规划</b><span>不限次数生成养护方案</span></div></div>
+              <div class="rem-item"><div class="rem-ico ok"><svg class="ico"><use href="#i-file"/></svg></div><div class="rem-body"><b>完整档案导出</b><span>PDF / 图文报告一键导出</span></div></div>
+              <div class="rem-item"><div class="rem-ico warn"><svg class="ico"><use href="#i-users"/></svg></div><div class="rem-body"><b>多人共享</b><span>邀请多位家人共同照顾</span></div></div>
+            </div>
+            <div class="btn btn-primary" style="margin-top:16px">升级会员 · ¥18/月</div>
+            <div class="btn btn-line" style="margin-top:10px">恢复购买</div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：档案导出 ============ -->
+        <div class="page" id="pg-export">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">档案导出</div><div class="pact"></div></div>
+          <div class="scroll">
+            <div class="section-head"><b>选择宠物</b></div>
+            <div class="type-grid">
+              <div class="cell on"><img src="assets/moe/avatar-cat.jpg" style="width:40px;height:40px;border-radius:13px;object-fit:cover">小白</div>
+              <div class="cell"><img src="assets/moe/avatar-dog.jpg" style="width:40px;height:40px;border-radius:13px;object-fit:cover">豆豆</div>
+            </div>
+            <div class="section-head"><b>导出格式</b></div>
+            <div class="type-grid">
+              <div class="cell on"><span class="ic coral"><svg class="ico"><use href="#i-file"/></svg></span>PDF 报告</div>
+              <div class="cell"><span class="ic blue"><svg class="ico"><use href="#i-image"/></svg></span>图文卡片</div>
+              <div class="cell"><span class="ic teal"><svg class="ico"><use href="#i-clipcheck"/></svg></span>数据表</div>
+            </div>
+            <div class="section-head"><b>导出内容</b></div>
+            <div class="card" style="padding:4px 14px">
+              <div class="rem-item"><div class="rem-body"><b>健康记录</b><span>疫苗 · 驱虫 · 体检 · 用药</span></div><span class="rem-tag green">已选</span></div>
+              <div class="rem-item"><div class="rem-body"><b>成长相册</b><span>照片 · 时间线</span></div><span class="rem-tag slate">可选</span></div>
+            </div>
+            <div class="btn btn-primary" style="margin-top:16px">生成并导出</div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：帮助与反馈 ============ -->
+        <div class="page" id="pg-help">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">帮助与反馈</div><div class="pact"></div></div>
+          <div class="scroll">
+            <div class="mascot-hero card" style="margin-bottom:14px">
+              <img src="assets/moe/mascot.jpg" alt="帮助">
+              <b>需要帮忙吗？</b><span>常见问题都在这儿，也可随时联系我们</span>
+            </div>
+            <div class="menu">
+              <div class="menu-item"><div class="m-ico amber"><svg class="ico"><use href="#i-info"/></svg></div><div class="m-body">如何添加提醒？</div><svg class="ico sm" style="color:#D8CCC0"><use href="#i-chev-r"/></svg></div>
+              <div class="menu-item"><div class="m-ico amber"><svg class="ico"><use href="#i-info"/></svg></div><div class="m-body">AI 建议可信吗？</div><svg class="ico sm" style="color:#D8CCC0"><use href="#i-chev-r"/></svg></div>
+              <div class="menu-item"><div class="m-ico amber"><svg class="ico"><use href="#i-info"/></svg></div><div class="m-body">如何邀请家人？</div><svg class="ico sm" style="color:#D8CCC0"><use href="#i-chev-r"/></svg></div>
+            </div>
+            <div class="menu" style="margin-top:14px">
+              <div class="menu-item"><div class="m-ico"><svg class="ico"><use href="#i-edit"/></svg></div><div class="m-body">意见反馈</div><svg class="ico sm" style="color:#D8CCC0"><use href="#i-chev-r"/></svg></div>
+              <div class="menu-item"><div class="m-ico"><svg class="ico"><use href="#i-share"/></svg></div><div class="m-body">分享给好友</div><svg class="ico sm" style="color:#D8CCC0"><use href="#i-chev-r"/></svg></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：关于宠记 ============ -->
+        <div class="page" id="pg-about">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">关于宠记</div><div class="pact"></div></div>
+          <div class="scroll">
+            <div class="mascot-hero card" style="margin-bottom:16px">
+              <img src="assets/moe/mascot.jpg" alt="宠记">
+              <b>宠记 PetLog</b><span>AI 养宠健康管家 · v1.0.0</span>
+            </div>
+            <div class="card" style="margin-bottom:12px">
+              <div style="font-size:13px;color:var(--text);line-height:1.7">宠记是一款面向宠物主的一站式健康管理工具，把散落的养宠信息翻译成一句句「该做什么」，让每一只毛孩子都被好好照顾。</div>
+            </div>
+            <div class="menu">
+              <div class="menu-item"><div class="m-ico"><svg class="ico"><use href="#i-shield"/></svg></div><div class="m-body">隐私政策</div><svg class="ico sm" style="color:#D8CCC0"><use href="#i-chev-r"/></svg></div>
+              <div class="menu-item"><div class="m-ico"><svg class="ico"><use href="#i-file"/></svg></div><div class="m-body">用户协议</div><svg class="ico sm" style="color:#D8CCC0"><use href="#i-chev-r"/></svg></div>
+            </div>
+            <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:20px">© 2026 宠记 PetLog · 用心守护每一只毛孩子</div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：报告卡 ============ -->
+        <div class="page" id="pg-report">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">报告卡</div><div class="pact">分享</div></div>
+          <div class="scroll">
+            <div class="mascot-hero card" style="margin-bottom:14px">
+              <img src="assets/moe/avatar-cat.jpg" alt="小白">
+              <b>小白的健康报告卡</b><span>2026 年 9 月 · 综合评分 88</span>
+            </div>
+            <div class="card" style="margin-bottom:12px">
+              <div class="rem-item"><div class="rem-ico primary"><svg class="ico"><use href="#i-sparkle"/></svg></div><div class="rem-body"><b>养护指数</b><span>四维加权</span></div><b style="font-size:20px;color:var(--primary)">88</b></div>
+              <div class="rem-item"><div class="rem-ico ok"><svg class="ico"><use href="#i-scale"/></svg></div><div class="rem-body"><b>体重</b><span>4.2 kg · 标准</span></div><span class="rem-tag green">良好</span></div>
+              <div class="rem-item"><div class="rem-ico warn"><svg class="ico"><use href="#i-droplet"/></svg></div><div class="rem-body"><b>待办</b><span>驱虫 · 1 项逾期</span></div><span class="rem-tag amber">需处理</span></div>
+            </div>
+            <div class="btn btn-mint"><svg class="ico"><use href="#i-share"/></svg> 保存 / 分享报告卡</div>
+            <div class="btn btn-line" style="margin-top:10px" data-open="pg-export">导出 PDF 报告</div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：AI 养护建议 ============ -->
+        <div class="page" id="pg-care-ai">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">AI 养护建议</div><div class="pact" style="color:var(--lav)">重新生成</div></div>
+          <div class="scroll">
+            <div class="mascot-hero card" style="margin-bottom:14px">
+              <img src="assets/moe/mascot.jpg" alt="AI 吉祥物">
+              <b>为「小白」生成 5 类养护建议</b>
+              <span>英短 · 2 岁 · 4.2kg · 已绝育 · 夏季</span>
+            </div>
+            <div class="section-head" style="margin-top:2px"><b>饮食</b><span class="ai-gen-tag"><svg class="ico xs"><use href="#i-sparkle"/></svg> AI</span></div>
+            <div class="plan-item"><div class="plan-body"><b>控制热量摄入</b><p>英短易超重，建议每日 50g 优质猫粮 + 充足饮水，减少零食。</p></div></div>
+            <div class="section-head"><b>运动</b></div>
+            <div class="plan-item"><div class="plan-body"><b>每天互动 15 分钟</b><p>英短运动量偏低，推荐逗猫棒 / 激光笔游戏，预防肥胖。</p></div></div>
+            <div class="section-head"><b>疫苗 / 驱虫</b></div>
+            <div class="plan-item"><div class="plan-body"><b>体内驱虫已逾期</b><p>上次 6/5，已超 3 个月，建议尽快使用海乐妙补驱。</p></div></div>
+            <div class="plan-item"><div class="plan-body"><b>狂犬疫苗即将到期</b><p>10 天后到期，建议提前预约附近医院接种。</p></div></div>
+            <div class="section-head"><b>体检</b></div>
+            <div class="plan-item"><div class="plan-body"><b>年度心脏超声</b><p>英短为心肌病高发品种，建议每年做一次心脏超声筛查。</p></div></div>
+            <div class="section-head"><b>当季提醒</b></div>
+            <div class="plan-item"><div class="plan-body"><b>夏季防暑与驱蚊</b><p>保持室内通风、充足凉爽饮水，避免高温时段外出。</p></div></div>
+            <div class="btn btn-primary" style="margin-top:16px" data-open="pg-plan-ai">去智能规划提醒</div>
+            <div class="ai-note"><svg class="ico xs" style="color:var(--muted)"><use href="#i-info"/></svg><span>AI 建议仅供参考，不替代专业兽医诊断。如有异常请及时就医。</span></div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：OCR 病历识别 ============ -->
+        <div class="page" id="pg-ocr">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">OCR 病历识别</div><div class="pact" style="color:var(--lav)">重新识别</div></div>
+          <div class="scroll">
+            <div class="scan-card">
+              <svg class="ico"><use href="#i-camera"/></svg>
+              <b>疫苗本 · 第 2 页</b>
+              <span>已拍摄，AI 识别中…</span>
+            </div>
+            <div class="section-head"><b>识别结果</b><span class="ai-gen-tag"><svg class="ico xs"><use href="#i-sparkle"/></svg> 提取 3 条</span></div>
+            <div class="plan-item"><div class="plan-chk on"><svg class="ico xs"><use href="#i-check"/></svg></div><div class="plan-body"><b>猫三联 · 第 3 针</b><p>妙三多 · 2026-06-15 · 1 剂 · 批号 M202606</p></div></div>
+            <div class="plan-item"><div class="plan-chk on"><svg class="ico xs"><use href="#i-check"/></svg></div><div class="plan-body"><b>狂犬疫苗</b><p>狂犬 · 2026-06-15 · 1 剂 · 次年复种</p></div></div>
+            <div class="plan-item"><div class="plan-chk"><svg class="ico xs"><use href="#i-check"/></svg></div><div class="plan-body"><b>体内驱虫</b><p>海乐妙 · 2026-06-05 · 下次 11-30</p></div></div>
+            <div class="btn btn-primary" style="margin-top:16px">确认并保存到档案</div>
+            <div class="ai-note"><svg class="ico xs" style="color:var(--muted)"><use href="#i-info"/></svg><span>请核对识别结果后再保存，避免日期或剂量有误。</span></div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：语音录入 ============ -->
+        <div class="page" id="pg-voice">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">语音录入</div><div class="pact"></div></div>
+          <div class="scroll">
+            <div class="voice-hero">
+              <div class="voice-ring"><svg class="ico"><use href="#i-mic"/></svg></div>
+              <div class="voice-wave"><i></i><i></i><i></i><i></i><i></i></div>
+              <b>正在听你说…</b><span>点击结束，AI 自动转文字并结构化</span>
+            </div>
+            <div class="section-head"><b>识别文字</b></div>
+            <div class="card" style="margin-bottom:12px;font-size:13px;color:var(--text);line-height:1.7">给小白做体内驱虫，用海乐妙，一片，今天早上喂的，精神都很好，没异常。</div>
+            <div class="section-head"><b>AI 结构化</b><span class="ai-gen-tag"><svg class="ico xs"><use href="#i-sparkle"/></svg> AI</span></div>
+            <div class="plan-item"><div class="plan-body"><b>类型 · 驱虫</b><p>体内 · 海乐妙 · 1 片 · 2026-09-07</p></div></div>
+            <div class="plan-item"><div class="plan-body"><b>备注</b><p>精神良好，无异常。</p></div></div>
+            <div class="btn btn-primary" style="margin-top:16px">确认保存记录</div>
+          </div>
+        </div>
+
+        <!-- ============ 覆盖层：AI 能力中心 ============ -->
+        <div class="page" id="pg-ai-center">
+          <div class="pheader"><div class="backbtn" data-back><svg class="ico"><use href="#i-chev-l"/></svg></div><div class="ptitle">AI 养宠助手</div><div class="pact" style="color:var(--lav)">设置</div></div>
+          <div class="scroll">
+            <div class="mascot-hero card" style="margin-bottom:14px">
+              <img src="assets/moe/mascot.jpg" alt="AI 助手">
+              <b>小白的 AI 养宠助手 🐾</b>
+              <span>智能识别 · 健康分析 · 养护建议 · 一个入口全搞定</span>
+            </div>
+
+            <div class="section-head"><b>智能能力</b><span class="ai-gen-tag"><svg class="ico xs"><use href="#i-sparkle"/></svg> 8 项</span></div>
+            <div class="quick">
+              <div class="cell" data-open="pg-care-ai"><span class="ic mint"><svg class="ico"><use href="#i-sparkle"/></svg></span>养护建议</div>
+              <div class="cell" data-open="pg-ocr"><span class="ic blue"><svg class="ico"><use href="#i-camera-ai"/></svg></span>病历识别</div>
+              <div class="cell" data-open="pg-voice"><span class="ic lav"><svg class="ico"><use href="#i-mic"/></svg></span>语音录入</div>
+              <div class="cell" data-open="pg-photo-bcs"><span class="ic pink"><svg class="ico"><use href="#i-image"/></svg></span>拍照估体况</div>
+              <div class="cell" data-open="pg-food-scan"><span class="ic amber"><svg class="ico"><use href="#i-food"/></svg></span>能吃啥</div>
+              <div class="cell" data-open="pg-plan-ai"><span class="ic coral"><svg class="ico"><use href="#i-cal"/></svg></span>智能规划</div>
+            </div>
+
+            <div class="section-head"><b>健康档案</b></div>
+            <div class="card" style="padding:4px 14px">
+              <div class="rem-item" data-open="pg-health-ai"><div class="rem-ico lav"><svg class="ico"><use href="#i-sparkle"/></svg></div><div class="rem-body"><b>AI 健康档案</b><span>养护指数 · 风险项 · 趋势解读</span></div><svg class="ico sm chev"><use href="#i-chev-r"/></svg></div>
+              <div class="rem-item" data-open="pg-report"><div class="rem-ico pink"><svg class="ico"><use href="#i-file"/></svg></div><div class="rem-body"><b>健康报告卡</b><span>一键生成 · 保存 / 分享</span></div><svg class="ico sm chev"><use href="#i-chev-r"/></svg></div>
+            </div>
+
+            <div class="section-head"><b>最近使用</b></div>
+            <div class="card" style="padding:4px 14px">
+              <div class="rem-item" data-open="pg-care-ai"><div class="rem-ico mint"><svg class="ico"><use href="#i-sparkle"/></svg></div><div class="rem-body"><b>夏季养护建议</b><span>今天 10:23</span></div><svg class="ico sm chev"><use href="#i-chev-r"/></svg></div>
+              <div class="rem-item" data-open="pg-ocr"><div class="rem-ico blue"><svg class="ico"><use href="#i-camera-ai"/></svg></div><div class="rem-body"><b>疫苗本识别</b><span>昨天 16:45</span></div><svg class="ico sm chev"><use href="#i-chev-r"/></svg></div>
+            </div>
+
+            <div class="ai-note"><svg class="ico xs" style="color:var(--muted)"><use href="#i-info"/></svg><span>AI 能力需联网使用，结果仅供参考，不替代专业兽医诊断。如有异常请及时就医。</span></div>
+          </div>
+        </div>
+
+        <!-- ============ Tab 栏 ============ -->
+        <div class="tabbar">
+          <div class="tab on" data-tab="home"><span class="tab-ic"><svg class="ico"><use href="#i-home"/></svg></span>首页</div>
+          <div class="tab" data-tab="records"><span class="tab-ic"><svg class="ico"><use href="#i-list"/></svg></span>记录</div>
+          <div class="tab" data-tab="reminders"><span class="tab-ic"><svg class="ico"><use href="#i-bell"/></svg></span>提醒</div>
+          <div class="tab" data-tab="mine"><span class="tab-ic"><svg class="ico"><use href="#i-user"/></svg></span>我的</div>
+        </div>
+
+        <!-- 头像操作底部面板（下载 / 更换） -->
+        <div class="sheet-mask" id="mascot-sheet">
+          <div class="sheet">
+            <div class="stitle">宠物头像</div>
+            <div class="sheet-row dl" id="mascot-download"><span class="s-ico"><svg class="ico"><use href="#i-download"/></svg></span>下载头像</div>
+            <div class="sheet-row up" id="mascot-upload"><span class="s-ico"><svg class="ico"><use href="#i-camera"/></svg></span>更换头像（本地图片）</div>
+            <div class="sheet-row cancel" id="mascot-cancel">取消</div>
+          </div>
+        </div>
+        <input type="file" id="mascot-file" accept="image/*" style="display:none">
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    // Tab 切换
+    var tabs = document.querySelectorAll('.tab');
+    var screens = document.querySelectorAll('.tab-screen');
+    tabs.forEach(function(t){
+      t.addEventListener('click', function(){
+        var key = t.getAttribute('data-tab');
+        tabs.forEach(function(x){x.classList.toggle('on', x===t)});
+        screens.forEach(function(s){
+          s.classList.toggle('active', s.getAttribute('data-screen')===key);
+        });
+      });
+    });
+
+    // 覆盖层打开（所有页面均为完整实现）
+    var openZ = 10;
+    function openPage(id){
+      var p = document.getElementById(id);
+      if(!p) return;
+      p.style.zIndex = ++openZ;
+      p.classList.add('open');
+      if(id === 'pg-plan-ai') triggerAiLoad();
+    }
+    document.querySelectorAll('[data-open]').forEach(function(el){
+      el.addEventListener('click', function(e){
+        e.stopPropagation();
+        openPage(el.getAttribute('data-open'));
+      });
+    });
+
+    // 返回
+    document.querySelectorAll('[data-back]').forEach(function(el){
+      el.addEventListener('click', function(e){
+        e.stopPropagation();
+        var p = el.closest('.page');
+        if(p) p.classList.remove('open');
+      });
+    });
+
+    // 记录页：事项记录 / 成长记录 双维度切换
+    var recSeg = document.getElementById('rec-seg');
+    if(recSeg){
+      recSeg.querySelectorAll('div').forEach(function(d){
+        d.addEventListener('click', function(){
+          recSeg.querySelectorAll('div').forEach(function(x){x.classList.remove('on')});
+          d.classList.add('on');
+          var isGrowth = d.getAttribute('data-view') === 'growth';
+          document.getElementById('rec-list').style.display = isGrowth ? 'none' : 'flex';
+          document.getElementById('rec-growth').style.display = isGrowth ? 'flex' : 'none';
+        });
+      });
+    }
+
+    // 记录页：分类筛选（按数据类别真实过滤）
+    function applyRecFilter(cat){
+      document.querySelectorAll('#rec-list .t-entry').forEach(function(e){
+        e.style.display = (cat === 'all' || e.getAttribute('data-cat') === cat) ? 'flex' : 'none';
+      });
+    }
+    var recChips = document.getElementById('rec-chips');
+    if(recChips){
+      recChips.querySelectorAll('.chip').forEach(function(ch){
+        ch.addEventListener('click', function(){
+          recChips.querySelectorAll('.chip').forEach(function(x){x.classList.remove('on')});
+          ch.classList.add('on');
+          applyRecFilter(ch.getAttribute('data-cat'));
+        });
+      });
+    }
+
+    // 分段 / 类型格子 / 勾选
+    document.querySelectorAll('.type-grid .cell, .seg div, .plan-chk').forEach(function(c){
+      c.addEventListener('click', function(){
+        if(c.classList.contains('plan-chk')){
+          c.classList.toggle('on');
+        } else {
+          var scope = c.parentElement;
+          scope.querySelectorAll('.cell, div').forEach(function(x){x.classList.remove('on')});
+          c.classList.add('on');
+        }
+      });
+    });
+
+    // 新建记录：猫/狗联动显示专属类型项（挤肛门腺=狗专属，换猫砂=猫专属）
+    function syncRecordTypesByPet(pet){
+      var page = document.getElementById('pg-new-record');
+      if(!page) return;
+      var isDog = pet === 'dog';
+      page.querySelectorAll('.anal-only').forEach(function(el){
+        el.style.display = isDog ? 'flex' : 'none';
+        if(!isDog) el.classList.remove('on');
+      });
+      page.querySelectorAll('.litter-only').forEach(function(el){
+        el.style.display = isDog ? 'none' : 'flex';
+        if(isDog) el.classList.remove('on');
+      });
+    }
+    var petSwitch = document.getElementById('rec-pet-switch');
+    if(petSwitch){
+      petSwitch.querySelectorAll('.ps').forEach(function(ps){
+        ps.addEventListener('click', function(){
+          petSwitch.querySelectorAll('.ps').forEach(function(x){x.classList.remove('on')});
+          ps.classList.add('on');
+          syncRecordTypesByPet(ps.getAttribute('data-pet'));
+        });
+      });
+      syncRecordTypesByPet('cat');
+    }
+
+    // 开关（纪念日提醒开关，含「添加纪念日」联动）
+    document.querySelectorAll('.switch').forEach(function(sw){
+      sw.addEventListener('click', function(e){
+        e.stopPropagation();
+        sw.classList.toggle('on');
+        if(sw.id === 'memo-rem-switch'){
+          var on = sw.classList.contains('on');
+          ['memo-rem-time','memo-rem-repeat'].forEach(function(id){
+            var f = document.getElementById(id);
+            if(f) f.style.display = on ? 'block' : 'none';
+          });
+        }
+      });
+    });
+
+    // 新建分类：所属分组单选
+    var catGroupChips = document.getElementById('cat-group-chips');
+    if(catGroupChips){
+      catGroupChips.querySelectorAll('.chip').forEach(function(ch){
+        ch.addEventListener('click', function(){
+          catGroupChips.querySelectorAll('.chip').forEach(function(x){x.classList.remove('on')});
+          ch.classList.add('on');
+        });
+      });
+    }
+
+    // 纪念日：提醒时间 / 重复周期 单选 chips
+    function bindSingleChipRow(id){
+      var row = document.getElementById(id);
+      if(!row) return;
+      row.querySelectorAll('.chip').forEach(function(ch){
+        ch.addEventListener('click', function(){
+          row.querySelectorAll('.chip').forEach(function(x){x.classList.remove('on')});
+          ch.classList.add('on');
+        });
+      });
+    }
+    bindSingleChipRow('memo-rem-time-chips');
+    bindSingleChipRow('memo-rem-repeat-chips');
+
+    // 新建记录：标题随所选分类联动
+    var recTitle = document.getElementById('rec-title-mock');
+    document.querySelectorAll('#pg-new-record .type-grid .cell').forEach(function(cell){
+      cell.addEventListener('click', function(){
+        if(cell.hasAttribute('data-open')) return;
+        if(recTitle) recTitle.textContent = cell.textContent.trim();
+      });
+    });
+
+    // ===== 多宠物切换：首页数据联动 =====
+    var HOME_PETS = {
+      cat: {
+        name:'小白', line:'我已经 7 天没有驱虫啦，快来帮我驱虫吧', mascot:'assets/moe/hero-cat.jpg',
+        todoDates:{9:[2,4,10,18,22]}, memoDates:{3:[15],6:[1],9:[19]}, recordDates:{9:[8,14,27]},
+        weightSeries:{'3m':[{m:'7月',v:4.0},{m:'8月',v:4.1},{m:'9月',v:4.2}],'6m':[{m:'4月',v:3.8},{m:'5月',v:3.9},{m:'6月',v:3.9},{m:'7月',v:4.0},{m:'8月',v:4.1},{m:'9月',v:4.2}],'1y':[{m:'10月',v:3.4},{m:'11月',v:3.5},{m:'12月',v:3.6},{m:'1月',v:3.6},{m:'2月',v:3.7},{m:'3月',v:3.7},{m:'4月',v:3.8},{m:'5月',v:3.9},{m:'6月',v:3.9},{m:'7月',v:4.0},{m:'8月',v:4.1},{m:'9月',v:4.2}]},
+        todos:[
+          {ico:'danger', icon:'i-droplet', title:'体内驱虫到期', desc:'小白 · 已超 7 天，赶紧处理'},
+          {ico:'amber', icon:'i-medical', title:'狂犬疫苗预约', desc:'小白 · 3 天后到期'}
+        ]
+      },
+      dog: {
+        name:'豆豆', line:'我已经 3 天没有驱虫啦，快来帮我驱虫吧', mascot:'assets/moe/avatar-dog.jpg',
+        todoDates:{9:[3,5,11,20,25]}, memoDates:{9:[8]}, recordDates:{9:[4,12,23]},
+        weightSeries:{'3m':[{m:'7月',v:8.3},{m:'8月',v:8.4},{m:'9月',v:8.5}],'6m':[{m:'4月',v:7.9},{m:'5月',v:8.0},{m:'6月',v:8.1},{m:'7月',v:8.3},{m:'8月',v:8.4},{m:'9月',v:8.5}],'1y':[{m:'10月',v:7.2},{m:'11月',v:7.4},{m:'12月',v:7.5},{m:'1月',v:7.6},{m:'2月',v:7.7},{m:'3月',v:7.8},{m:'4月',v:7.9},{m:'5月',v:8.0},{m:'6月',v:8.1},{m:'7月',v:8.3},{m:'8月',v:8.4},{m:'9月',v:8.5}]},
+        todos:[
+          {ico:'danger', icon:'i-droplet', title:'体外驱虫到期', desc:'豆豆 · 已超 3 天，赶紧处理'},
+          {ico:'amber', icon:'i-clipcheck', title:'年度体检预约', desc:'豆豆 · 5 天后到期'}
+        ]
+      }
+    };
+    var activeHomePet = 'cat';
+    function setTodoIcon(el, color, href){
+      if(!el) return;
+      el.className = 'todo-ico ' + color;
+      var u = el.querySelector('use'); if(u) u.setAttribute('href', '#' + href);
+    }
+    function homeGreeting(){
+      var h = new Date().getHours();
+      if(h < 5) return '主人夜深啦';
+      if(h < 11) return '主人早呀';
+      if(h < 14) return '主人中午好';
+      if(h < 18) return '主人下午好';
+      return '主人晚上好';
+    }
+    function applyHomePet(key){
+      var p = HOME_PETS[key];
+      var mascot = document.getElementById('home-mascot');
+      var hi = document.getElementById('home-pet-name');
+      var line = document.getElementById('home-name');
+      var greet = document.getElementById('home-greet');
+      if(mascot) mascot.src = p.mascot;
+      if(hi) hi.textContent = p.name;
+      if(line) line.textContent = p.line;
+      if(greet) greet.textContent = homeGreeting();
+      var t1 = p.todos[0], t2 = p.todos[1];
+      setTodoIcon(document.getElementById('todo1-ico'), t1.ico, t1.icon);
+      document.getElementById('todo1-title').textContent = t1.title;
+      document.getElementById('todo1-desc').textContent = t1.desc;
+      setTodoIcon(document.getElementById('todo2-ico'), t2.ico, t2.icon);
+      document.getElementById('todo2-title').textContent = t2.title;
+      document.getElementById('todo2-desc').textContent = t2.desc;
+      if(typeof renderHomeCal === 'function') renderHomeCal();
+      if(typeof renderWeightTrend === 'function') renderWeightTrend();
+    }
+    var hpsRow = document.getElementById('home-pet-switch');
+    if(hpsRow){
+      hpsRow.querySelectorAll('.pseg').forEach(function(h){
+        h.addEventListener('click', function(){
+          hpsRow.querySelectorAll('.pseg').forEach(function(x){x.classList.remove('on')});
+          h.classList.add('on');
+          activeHomePet = h.getAttribute('data-pet');
+          applyHomePet(activeHomePet);
+        });
+      });
+    }
+
+    // 首页日历：月份切换 + 事件标记 + 点击联动（随当前宠物联动）
+    var homeCal = document.getElementById('home-cal');
+    if(homeCal){
+      var gridEl = homeCal.querySelector('.cal-grid');
+      var mLabel = homeCal.querySelector('.hcal-head .m b');
+      var yLabel = homeCal.querySelector('.hcal-head .m span');
+      var todayTag = homeCal.querySelector('.today-tag');
+      var navBtns = homeCal.querySelectorAll('.hcal-head .nav span');
+      var today = new Date(2026, 8, 7);   // 示例「今天」2026-09-07
+      var view = new Date(2026, 8, 1);    // 当前显示月份
+      var DOW = ['日','一','二','三','四','五','六'];
+      function renderHomeCal(){
+        var p = HOME_PETS[activeHomePet];
+        var todoDates = p.todoDates, memoDates = p.memoDates || {}, recDates = p.recordDates || {};
+        var y = view.getFullYear(), m = view.getMonth();
+        var key = m+1;
+        mLabel.textContent = key + ' 月';
+        yLabel.textContent = y;
+        var first = new Date(y, m, 1).getDay();
+        var days = new Date(y, m+1, 0).getDate();
+        var isCurMonth = (y === today.getFullYear() && m === today.getMonth());
+        todayTag.textContent = isCurMonth ? ('今天 · ' + today.getDate() + ' 号') : key + ' 月';
+        var html = DOW.map(function(dd){return '<div class="dow">'+dd+'</div>'}).join('');
+        for(var i=0;i<first;i++){ html += '<div class="d dim"><span class="dn"></span><span class="dd"></span></div>'; }
+        for(var d=1;d<=days;d++){
+          var cls = 'd';
+          if(isCurMonth && d === today.getDate()) cls += ' today';
+          var isTodo = (todoDates[key]||[]).indexOf(d) > -1;
+          var isRec = (recDates[key]||[]).indexOf(d) > -1;
+          var isMemo = (memoDates[key]||[]).indexOf(d) > -1;
+          if(isTodo) cls += ' dot';
+          else if(isRec) cls += ' dot green';
+          else if(isMemo) cls += ' dot pink';
+          html += '<div class="'+cls+'" data-day="'+d+'"><span class="dn">'+d+'</span><span class="dd"></span></div>';
+        }
+        gridEl.innerHTML = html;
+      }
+      function openDayDetail(day){
+        var p = HOME_PETS[activeHomePet];
+        var m = view.getMonth()+1;
+        var title = document.getElementById('day-title');
+        if(title) title.textContent = m + ' 月 ' + day + ' 日';
+        var todoDates = p.todoDates[m] || [];
+        var recDates = p.recordDates ? (p.recordDates[m]||[]) : [];
+        var todoList = document.getElementById('day-todo-list');
+        var recList = document.getElementById('day-rec-list');
+        var isTodo = todoDates.indexOf(day) > -1;
+        var isRec = recDates.indexOf(day) > -1;
+        if(isTodo){
+          todoList.innerHTML = p.todos.map(function(t){
+            return '<div class="rem-item"><div class="rem-ico '+t.ico+'"><svg class="ico"><use href="#'+t.icon+'"/></svg></div><div class="rem-body"><b>'+t.title+'</b><span>'+t.desc+'</span></div><span class="rem-tag amber">待处理</span></div>';
+          }).join('');
+        } else {
+          todoList.innerHTML = '<div class="rem-item"><div class="rem-ico ok"><svg class="ico"><use href="#i-check"/></svg></div><div class="rem-body"><b>没有待办</b><span>这一天很轻松哦 🐾</span></div></div>';
+        }
+        if(isRec){
+          recList.innerHTML = '<div class="rem-item"><div class="rem-ico blue"><svg class="ico"><use href="#i-scale"/></svg></div><div class="rem-body"><b>记录体重</b><span>'+m+' 月 '+day+' 日 · 体重已记录 · 标准</span></div><span class="rem-tag green">已记录</span></div>' +
+            '<div class="rem-item"><div class="rem-ico primary"><svg class="ico"><use href="#i-sparkle"/></svg></div><div class="rem-body"><b>AI 点评</b><span>体重稳定，继续保持 🎉</span></div></div>';
+        } else {
+          recList.innerHTML = '<div class="rem-item"><div class="rem-ico slate"><svg class="ico"><use href="#i-scale"/></svg></div><div class="rem-body"><b>暂无记录</b><span>点击右上角「+ 记录」给 TA 记一笔</span></div></div>';
+        }
+        openPage('pg-day-detail');
+      }
+      navBtns[0].addEventListener('click', function(){ view.setMonth(view.getMonth()-1); renderHomeCal(); });
+      navBtns[1].addEventListener('click', function(){ view.setMonth(view.getMonth()+1); renderHomeCal(); });
+      gridEl.addEventListener('click', function(e){
+        var t = e.target.closest('.d');
+        if(!t) return;
+        var day = parseInt(t.getAttribute('data-day'), 10);
+        if(!day) return;
+        openDayDetail(day);
+      });
+      renderHomeCal();
+    }
+
+    // 体重变化：折线图（可爱爪印风）
+    var activeWeightRange = '3m';
+    function renderWeightTrend(){
+      var p = HOME_PETS[activeHomePet];
+      var series = p.weightSeries || {};
+      var data = series[activeWeightRange] || [];
+      var svg = document.getElementById('weight-trend-svg');
+      var empty = document.getElementById('weight-empty');
+      var legend = document.getElementById('trend-legend');
+      if(!svg) return;
+
+      // 0 条记录：空态引导
+      if(data.length === 0){
+        svg.style.display = 'none';
+        if(legend) legend.style.display = 'none';
+        if(empty){
+          empty.style.display = 'block';
+          empty.innerHTML = '<div class="we-inner"><div class="we-paw">🐾</div><b>还没有体重记录</b><span class="we-sub">给 TA 记一笔，就能开启趋势啦</span><div class="btn btn-ghost" id="we-go-btn">去记第一笔</div></div>';
+          var btn0 = document.getElementById('we-go-btn');
+          if(btn0) btn0.addEventListener('click', function(){ openPage('pg-weight'); });
+        }
+        return;
+      }
+      // 1 条记录：退化为单点卡
+      if(data.length === 1){
+        svg.style.display = 'none';
+        if(legend) legend.style.display = 'none';
+        var d1 = data[0];
+        if(empty){
+          empty.style.display = 'block';
+          empty.innerHTML = '<div class="we-inner"><div class="we-paw">🐾</div><div class="we-val">'+d1.v+'<small> kg</small></div><span class="we-date">'+d1.m+' 记录</span><span class="we-tip">再记几次，就能看到趋势啦</span></div>';
+        }
+        return;
+      }
+      // 2 条及以上：折线
+      svg.style.display = 'block';
+      if(empty) empty.style.display = 'none';
+      if(legend){
+        legend.style.display = 'flex';
+        legend.textContent = data.length === 2 ? '再记一次，趋势更准哦 🐾' : '🐾 体重稳步上升 · 健康在线';
+      }
+      var W=320, H=118, L=28, R=16, T=20, B=26;
+      var min = Math.min.apply(null, data.map(function(d){return d.v}));
+      var max = Math.max.apply(null, data.map(function(d){return d.v}));
+      var lo = min - 0.1, hi = max + 0.1, range = (hi - lo) || 1;
+      var drawW = W - L - R, drawH = H - T - B;
+      var pts = data.map(function(d, i){
+        var x = L + i * (drawW / (data.length - 1));
+        var y = T + (hi - d.v) / range * drawH;
+        return {x:x, y:y, m:d.m, v:d.v};
+      });
+      var line = pts.map(function(pt, i){ return (i ? 'L' : 'M') + pt.x.toFixed(1) + ' ' + pt.y.toFixed(1); }).join(' ');
+      var nodes = pts.map(function(pt, i){
+        var isLast = i === data.length - 1;
+        var valLabel = '<text x="'+pt.x.toFixed(1)+'" y="'+(pt.y-10).toFixed(1)+'" text-anchor="middle" font-size="9" font-weight="800" fill="#C98A5E">'+pt.v+'</text>';
+        if(isLast) return valLabel + '<text x="'+pt.x.toFixed(1)+'" y="'+(pt.y+5).toFixed(1)+'" text-anchor="middle" font-size="16">🐾</text>';
+        return valLabel + '<circle cx="'+pt.x.toFixed(1)+'" cy="'+pt.y.toFixed(1)+'" r="3.6" fill="#fff" stroke="#FF9A6B" stroke-width="2.4"/>';
+      }).join('');
+      var labels = pts.map(function(pt){
+        return '<text x="'+pt.x.toFixed(1)+'" y="'+(H-6)+'" text-anchor="middle" font-size="9.5" font-weight="700" fill="#B7A99B">'+pt.m+'</text>';
+      }).join('');
+      svg.innerHTML = '<path d="'+line+'" fill="none" stroke="#FF9A6B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>' + nodes + labels;
+    }
+    var wrEl = document.getElementById('weight-range');
+    if(wrEl){
+      wrEl.querySelectorAll('.chip').forEach(function(ch){
+        ch.addEventListener('click', function(){
+          wrEl.querySelectorAll('.chip').forEach(function(x){x.classList.remove('on')});
+          ch.classList.add('on');
+          activeWeightRange = ch.getAttribute('data-range');
+          renderWeightTrend();
+        });
+      });
+    }
+    applyHomePet(activeHomePet);
+
+    // 宠物头像：自动生成 / 上传照片
+    var avatarEditBtn = document.getElementById('avatar-edit-btn');
+    var avatarActions = document.getElementById('avatar-actions');
+    if(avatarEditBtn && avatarActions){
+      avatarEditBtn.addEventListener('click', function(e){
+        e.stopPropagation();
+        avatarActions.style.display = avatarActions.style.display === 'flex' ? 'none' : 'flex';
+      });
+      var AI_AVATARS = ['assets/moe/mascot.jpg','assets/moe/hero-cat.jpg','assets/moe/avatar-dog.jpg','assets/moe/welcome.jpg'];
+      var aiIdx = 0;
+      var avaAuto = document.getElementById('ava-auto');
+      if(avaAuto){
+        avaAuto.addEventListener('click', function(){
+          var label = avaAuto.querySelector('span');
+          var original = label ? label.textContent : '自动生成';
+          if(label) label.textContent = '生成中 ✨';
+          setTimeout(function(){
+            aiIdx = (aiIdx + 1) % AI_AVATARS.length;
+            var img = document.getElementById('pet-avatar');
+            if(img) img.src = AI_AVATARS[aiIdx];
+            if(label) label.textContent = original;
+          }, 800);
+        });
+      }
+      var avaUpload = document.getElementById('ava-upload');
+      var avaFile = document.getElementById('ava-file');
+      if(avaUpload && avaFile){
+        avaUpload.addEventListener('click', function(){ avaFile.click(); });
+        avaFile.addEventListener('change', function(){
+          var f = avaFile.files && avaFile.files[0];
+          if(!f) return;
+          var reader = new FileReader();
+          reader.onload = function(ev){
+            var img = document.getElementById('pet-avatar');
+            if(img) img.src = ev.target.result;
+          };
+          reader.readAsDataURL(f);
+        });
+      }
+    }
+
+    // AI 加载动画
+    window.triggerAiLoad = function(){
+      var loading = document.getElementById('ai-loading');
+      var content = document.getElementById('plan-content');
+      if(!loading || !content) return;
+      loading.style.display = 'flex';
+      content.style.display = 'none';
+      setTimeout(function(){
+        loading.style.display = 'none';
+        content.style.display = 'block';
+      }, 1600);
+    };
+
+    // 欢迎页关闭
+    window.closeWelcome = function(){
+      var w = document.getElementById('welcome');
+      if(w) w.classList.add('hide');
+    };
+    // 开始体验：进入「创建宠物档案」引导
+    window.startOnboarding = function(){
+      closeWelcome();
+      openPage('pg-onboarding');
+    };
+    var obSkip = document.getElementById('ob-skip');
+    if(obSkip) obSkip.addEventListener('click', function(){ var p = document.getElementById('pg-onboarding'); if(p) p.classList.remove('open'); });
+    var createPetBtn = document.getElementById('create-pet-btn');
+    if(createPetBtn){
+      createPetBtn.addEventListener('click', function(){
+        var name = (document.getElementById('ob-name')||{}).value || '小宝贝';
+        showToast('已为「' + name + '」创建档案 🐾');
+        var page = document.getElementById('pg-onboarding');
+        if(page) page.classList.remove('open');
+      });
+    }
+
+    // ===== 全局 toast 反馈 =====
+    var toastEl = document.getElementById('toast');
+    var toastTimer = null;
+    function showToast(msg){
+      if(!toastEl) return;
+      toastEl.textContent = msg;
+      toastEl.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function(){ toastEl.classList.remove('show'); }, 1900);
+    }
+
+    // ===== 首页宠物头像：下载 / 更换（本地上传）=====
+    var mascotWrap = document.getElementById('home-mascot-wrap');
+    var mascotSheet = document.getElementById('mascot-sheet');
+    var mascotFile = document.getElementById('mascot-file');
+    var mascotImg = document.getElementById('home-mascot');
+    function openMascotSheet(){ if(mascotSheet) mascotSheet.classList.add('show'); }
+    function closeMascotSheet(){ if(mascotSheet) mascotSheet.classList.remove('show'); }
+    if(mascotWrap && mascotSheet){
+      mascotWrap.addEventListener('click', openMascotSheet);
+      mascotSheet.addEventListener('click', function(e){ if(e.target === mascotSheet) closeMascotSheet(); });
+      var dlBtn = document.getElementById('mascot-download');
+      var upBtn = document.getElementById('mascot-upload');
+      var cancelBtn = document.getElementById('mascot-cancel');
+      if(dlBtn){
+        dlBtn.addEventListener('click', function(){
+          closeMascotSheet();
+          if(mascotImg){
+            var a = document.createElement('a');
+            a.href = mascotImg.src;
+            a.download = 'pet-avatar.jpg';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          }
+          showToast('头像已保存到相册');
+        });
+      }
+      if(upBtn && mascotFile){
+        upBtn.addEventListener('click', function(){ closeMascotSheet(); mascotFile.click(); });
+        mascotFile.addEventListener('change', function(){
+          var f = mascotFile.files && mascotFile.files[0];
+          if(!f) return;
+          var reader = new FileReader();
+          reader.onload = function(ev){
+            var dataUrl = ev.target.result;
+            if(mascotImg) mascotImg.src = dataUrl;
+            if(HOME_PETS[activeHomePet]) HOME_PETS[activeHomePet].mascot = dataUrl;
+            showToast('头像已更新');
+          };
+          reader.readAsDataURL(f);
+        });
+      }
+      if(cancelBtn) cancelBtn.addEventListener('click', closeMascotSheet);
+    }
+
+    // ===== AI 估体况：拍摄/上传 + 评分标准 =====
+    var bcsShoot = document.getElementById('bcs-shoot');
+    var bcsFile = document.getElementById('bcs-file');
+    if(bcsShoot && bcsFile){
+      bcsShoot.addEventListener('click', function(){ bcsFile.click(); });
+      bcsFile.addEventListener('change', function(){
+        var f = bcsFile.files && bcsFile.files[0];
+        if(!f) return;
+        var reader = new FileReader();
+        reader.onload = function(ev){
+          var img = document.getElementById('bcs-photo');
+          if(img) img.src = ev.target.result;
+        };
+        reader.readAsDataURL(f);
+        var score = document.getElementById('bcs-score');
+        var orig = bcsShoot.innerHTML;
+        bcsShoot.innerHTML = 'AI 分析中 ✨';
+        setTimeout(function(){
+          bcsShoot.innerHTML = orig;
+          if(score) score.textContent = '4/9';
+          showToast('已识别：BCS 4/9 · 略瘦');
+        }, 1100);
+      });
+    }
+    var bcsStdBtn = document.getElementById('bcs-std-btn');
+    var bcsPanel = document.getElementById('bcs-panel');
+    if(bcsStdBtn && bcsPanel){
+      bcsStdBtn.addEventListener('click', function(){
+        var hidden = bcsPanel.style.display === 'none';
+        bcsPanel.style.display = hidden ? 'block' : 'none';
+        bcsStdBtn.textContent = hidden ? '收起体况评分标准' : '查看体况评分标准';
+      });
+    }
+
+    // ===== 新建提醒：宠物胶囊 + 选项芯片 + 创建并加入列表 =====
+    var remPetSelect = document.getElementById('rem-pet-select');
+    if(remPetSelect){
+      remPetSelect.querySelectorAll('.pet-card').forEach(function(card){
+        card.addEventListener('click', function(){
+          remPetSelect.querySelectorAll('.pet-card').forEach(function(x){x.classList.remove('on')});
+          card.classList.add('on');
+        });
+      });
+    }
+    // 选项芯片组：组内单选
+    document.querySelectorAll('#pg-new-reminder .opt-group').forEach(function(group){
+      group.querySelectorAll('.opt-chip').forEach(function(chip){
+        chip.addEventListener('click', function(){
+          group.querySelectorAll('.opt-chip').forEach(function(x){x.classList.remove('on')});
+          chip.classList.add('on');
+        });
+      });
+    });
+    function chipVal(groupId){
+      var g = document.getElementById(groupId);
+      if(!g) return '';
+      var on = g.querySelector('.opt-chip.on');
+      return on ? on.getAttribute('data-val') : '';
+    }
+    // 日期选项 → 状态标签
+    function tagForDate(dateVal){
+      if(dateVal === '今天') return {cls:'amber', text:'今天'};
+      if(dateVal === '明天') return {cls:'amber', text:'明天'};
+      if(dateVal === '3 天后') return {cls:'amber', text:'3 天后'};
+      return {cls:'blue', text:'已计划'};
+    }
+    var createReminderBtn = document.getElementById('create-reminder-btn');
+    if(createReminderBtn){
+      createReminderBtn.addEventListener('click', function(){
+        var input = document.getElementById('rem-title-input');
+        var title = input ? input.value.trim() : '';
+        if(!title){
+          showToast('先填一下提醒事项吧 🐾');
+          if(input) input.focus();
+          return;
+        }
+        var petCard = remPetSelect ? remPetSelect.querySelector('.pet-card.on') : null;
+        var petName = petCard ? petCard.getAttribute('data-name') : '小白';
+        var dateVal = chipVal('rem-date-group') || '今天';
+        var repeatVal = chipVal('rem-repeat-group') || '不重复';
+        var aheadVal = chipVal('rem-ahead-group') || '提前 1 天';
+        var tag = tagForDate(dateVal);
+        var key = 'new-' + Date.now();
+
+        // 写入详情数据源
+        REM_INFO[key] = {
+          title: title,
+          sub: petName + ' · ' + repeatVal,
+          status: tag.text,
+          statusCls: tag.cls,
+          next: dateVal + '（' + repeatVal + '）',
+          repeat: repeatVal,
+          ahead: aheadVal === '当天' ? '当天提醒' : aheadVal
+        };
+
+        // 插入提醒列表（清掉空态）
+        var card = document.getElementById('rem-list-card');
+        if(card){
+          var empty = card.querySelector('.rem-empty');
+          if(empty) empty.remove();
+          var item = document.createElement('div');
+          item.className = 'rem-item';
+          item.setAttribute('data-rem', key);
+          item.setAttribute('data-open', 'pg-reminder-detail');
+          item.innerHTML =
+            '<div class="rem-ico primary"><svg class="ico"><use href="#i-bell-heart"/></svg></div>' +
+            '<div class="rem-body"><b></b><span></span></div>' +
+            '<span class="rem-tag ' + tag.cls + '">' + tag.text + '</span>';
+          item.querySelector('.rem-body b').textContent = title;
+          item.querySelector('.rem-body span').textContent = petName + ' · ' + repeatVal;
+          item.addEventListener('click', function(){
+            currentRem = key;
+            populateReminderDetail(key);
+            openPage('pg-reminder-detail');
+          });
+          card.insertBefore(item, card.firstChild);
+        }
+        syncReminderList();
+
+        var page = document.getElementById('pg-new-reminder');
+        if(page) page.classList.remove('open');
+        // 重置表单
+        if(input) input.value = '';
+        showToast('「' + title + '」提醒已创建 🐾');
+      });
+    }
+
+    // ===== 今日待办 / 提醒「处理」一键标记完成 =====
+    document.querySelectorAll('.btn-ghost').forEach(function(btn){
+      btn.addEventListener('click', function(e){
+        e.stopPropagation();
+        if(btn.textContent.trim() !== '处理') return;
+        var item = btn.closest('.todo-card, .rem-item');
+        if(item) item.classList.add('done');
+        btn.classList.add('done');
+        btn.textContent = '已完成';
+        showToast('已标记为完成 ✓');
+        if(typeof syncReminderList === 'function') syncReminderList();
+      });
+    });
+
+    // ===== 提醒详情：数据 + 标记完成 / 删除 / 编辑 =====
+    var REM_INFO = {
+      'deworm-in': {title:'体内驱虫', sub:'小白 · 每 3 个月', status:'已逾期', statusCls:'red', next:'2026-09-07（已超 7 天）', repeat:'每 3 个月', ahead:'提前 7 天 + 1 天'},
+      'vaccine':   {title:'狂犬疫苗', sub:'小白 · 每年接种', status:'即将到期', statusCls:'amber', next:'2026-09-10（3 天后）', repeat:'每 1 年', ahead:'提前 7 天'},
+      'checkup':   {title:'年度体检', sub:'小白 · 每年一次', status:'已计划', statusCls:'blue', next:'2026-09-21（2 周后）', repeat:'每 1 年', ahead:'提前 14 天'},
+      'deworm-out':{title:'外用驱虫', sub:'小白 · 每月一次', status:'进行中', statusCls:'slate', next:'2026-10-01（下月 1 日）', repeat:'每 1 个月', ahead:'提前 1 天'},
+      'bath-done': {title:'洗澡美容', sub:'小白 · 已完成', status:'已完成', statusCls:'green', next:'已完成 · 今天 14:20', repeat:'每 2 周', ahead:'提前 1 天'},
+      'memo-off':  {title:'到家纪念日', sub:'小白 · 提醒已关闭', status:'已关闭', statusCls:'ghost', next:'—（已关闭提醒）', repeat:'每年', ahead:'—'}
+    };
+    var currentRem = null;
+    var rdEditing = false;
+
+    function remItems(key){
+      return Array.prototype.slice.call(document.querySelectorAll('[data-rem="'+key+'"]'));
+    }
+    function syncReminderList(){
+      var card = document.getElementById('rem-list-card');
+      var cnt = document.getElementById('rem-overdue-count');
+      if(card){
+        var items = card.querySelectorAll('.rem-item');
+        if(items.length === 0 && !card.querySelector('.rem-empty')){
+          card.innerHTML = '<div class="rem-empty">暂无待办提醒，去陪 TA 玩吧 🐾</div>';
+        }
+        var overdue = 0;
+        card.querySelectorAll('.rem-item').forEach(function(it){
+          if(it.classList.contains('done')) return;
+          var tg = it.querySelector('.rem-tag');
+          if(tg && tg.classList.contains('red')) overdue++;
+        });
+        if(cnt) cnt.textContent = overdue > 0 ? (overdue + ' 项逾期') : '暂无逾期 · 全部安排妥当 🐾';
+      }
+    }
+    function populateReminderDetail(key){
+      var info = REM_INFO[key];
+      if(!info) return;
+      var set = function(id, v){ var el=document.getElementById(id); if(el) el.textContent=v; };
+      set('rd-title', info.title);
+      set('rd-sub', info.sub);
+      set('rd-status', info.status);
+      var st = document.getElementById('rd-status');
+      if(st){ st.className = 'rem-tag ' + info.statusCls; }
+      var fields = document.querySelectorAll('#pg-reminder-detail .rd-field');
+      var vals = {title:info.title, next:info.next, repeat:info.repeat, ahead:info.ahead};
+      fields.forEach(function(f){
+        f.value = vals[f.getAttribute('data-field')] || '';
+        f.readOnly = true;
+      });
+      rdEditing = false;
+      var editBtn = document.getElementById('rd-edit');
+      if(editBtn) editBtn.textContent = '编辑';
+    }
+    document.querySelectorAll('[data-rem]').forEach(function(item){
+      item.addEventListener('click', function(){
+        currentRem = item.getAttribute('data-rem');
+        populateReminderDetail(currentRem);
+      });
+    });
+
+    // 标记完成
+    var rdDone = document.getElementById('rd-done');
+    if(rdDone){
+      rdDone.addEventListener('click', function(){
+        if(!currentRem) return;
+        remItems(currentRem).forEach(function(it){
+          it.classList.add('done');
+          var gh = it.querySelector('.btn-ghost');
+          if(gh){ gh.textContent = '已完成'; gh.classList.add('done'); }
+          var tg = it.querySelector('.rem-tag');
+          if(tg){ tg.textContent = '已完成'; tg.className = 'rem-tag green'; }
+        });
+        var page = document.getElementById('pg-reminder-detail');
+        if(page) page.classList.remove('open');
+        showToast('已标记为完成 ✓');
+        syncReminderList();
+      });
+    }
+
+    // 删除提醒
+    var rdDelete = document.getElementById('rd-delete');
+    if(rdDelete){
+      rdDelete.addEventListener('click', function(){
+        if(!currentRem) return;
+        remItems(currentRem).forEach(function(it){ it.remove(); });
+        var page = document.getElementById('pg-reminder-detail');
+        if(page) page.classList.remove('open');
+        showToast('提醒已删除');
+        syncReminderList();
+      });
+    }
+
+    // 编辑 / 保存
+    var rdEdit = document.getElementById('rd-edit');
+    if(rdEdit){
+      rdEdit.addEventListener('click', function(e){
+        e.stopPropagation();
+        var fields = document.querySelectorAll('#pg-reminder-detail .rd-field');
+        if(!rdEditing){
+          rdEditing = true;
+          rdEdit.textContent = '保存';
+          fields.forEach(function(f){ f.readOnly = false; });
+          if(fields[0]){ fields[0].focus(); fields[0].select && fields[0].select(); }
+          showToast('可直接修改内容，改完点保存');
+        } else {
+          rdEditing = false;
+          rdEdit.textContent = '编辑';
+          var vals = {};
+          fields.forEach(function(f){
+            f.readOnly = true;
+            vals[f.getAttribute('data-field')] = f.value.trim();
+          });
+          var newTitle = vals.title || '';
+          var tEl = document.getElementById('rd-title');
+          if(tEl && newTitle) tEl.textContent = newTitle;
+          // 同步回数据源，再次打开仍保留
+          if(currentRem && REM_INFO[currentRem]){
+            REM_INFO[currentRem].title = newTitle || REM_INFO[currentRem].title;
+            if(vals.next) REM_INFO[currentRem].next = vals.next;
+            if(vals.repeat) REM_INFO[currentRem].repeat = vals.repeat;
+            if(vals.ahead) REM_INFO[currentRem].ahead = vals.ahead;
+          }
+          if(currentRem && newTitle){
+            remItems(currentRem).forEach(function(it){
+              var b = it.querySelector('.rem-body b');
+              if(b) b.textContent = newTitle;
+            });
+          }
+          showToast('修改已保存 ✓');
+        }
+      });
+    }
+
+    // 处理页：标记为已处理
+    var handleSubmit = document.getElementById('handle-submit');
+    if(handleSubmit){
+      handleSubmit.addEventListener('click', function(){
+        remItems('deworm-in').forEach(function(it){
+          it.classList.add('done');
+          var gh = it.querySelector('.btn-ghost');
+          if(gh){ gh.textContent = '已完成'; gh.classList.add('done'); }
+          var tg = it.querySelector('.rem-tag');
+          if(tg){ tg.textContent = '已完成'; tg.className = 'rem-tag green'; }
+        });
+        var page = document.getElementById('pg-handle');
+        if(page) page.classList.remove('open');
+        showToast('已处理并记录 ✓ 已为 TA 排好下次提醒');
+        syncReminderList();
+      });
+    }
+    syncReminderList();
+
+    // ===== 宠物照相馆：主题切换 + 拍照/上传 + 生成分享图 =====
+    if(document.getElementById('photo-themes')){
+      document.querySelectorAll('#photo-themes .cell').forEach(function(c){
+        c.addEventListener('click', function(){
+          var theme = c.getAttribute('data-theme');
+          var frame = document.getElementById('pp-frame');
+          if(frame) frame.textContent = theme + '主题';
+          var imgs = ['assets/moe/avatar-dog.jpg','assets/moe/hero-cat.jpg','assets/moe/avatar-cat.jpg','assets/moe/welcome.jpg','assets/moe/mascot.jpg','assets/moe/avatar-dog.jpg'];
+          var idx = Array.prototype.indexOf.call(c.parentElement.children, c);
+          var img = document.getElementById('photo-preview-img');
+          if(img) img.src = imgs[idx % imgs.length];
+        });
+      });
+    }
+    var photoShoot = document.getElementById('photo-shoot');
+    var photoFile = document.getElementById('photo-file');
+    if(photoShoot && photoFile){
+      photoShoot.addEventListener('click', function(){ photoFile.click(); });
+      photoFile.addEventListener('change', function(){
+        var f = photoFile.files && photoFile.files[0];
+        if(!f) return;
+        var reader = new FileReader();
+        reader.onload = function(ev){
+          var img = document.getElementById('photo-preview-img');
+          if(img) img.src = ev.target.result;
+        };
+        reader.readAsDataURL(f);
+        showToast('照片已就绪，可选主题生成分享图');
+      });
+    }
+    var photoShare = document.getElementById('photo-share');
+    if(photoShare){
+      photoShare.addEventListener('click', function(){
+        showToast('分享图已生成，可保存 / 分享');
+      });
+    }
+
+    // ===== AI 健康档案：生成 / 评级趋势明细 =====
+    var healthGenBtn = document.getElementById('health-gen-btn');
+    if(healthGenBtn){
+      healthGenBtn.addEventListener('click', function(){
+        healthGenBtn.textContent = '生成中…';
+        showToast('AI 正在整理健康档案…');
+        setTimeout(function(){
+          healthGenBtn.textContent = '生成';
+          showToast('健康档案已更新 ✓');
+        }, 1400);
+      });
+    }
+    document.querySelectorAll('[data-expand]').forEach(function(el){
+      el.addEventListener('click', function(){
+        var target = document.getElementById(el.getAttribute('data-expand'));
+        if(target){
+          target.style.display = target.style.display === 'none' ? 'block' : 'none';
+        }
+      });
+    });
+    document.querySelectorAll('[data-detail]').forEach(function(el){
+      el.addEventListener('click', function(){
+        showToast(el.getAttribute('data-detail'));
+      });
+    });
+
+    // ===== AI 智能规划：重新生成 + 一键加入 =====
+    var planRegenBtn = document.getElementById('plan-regen-btn');
+    if(planRegenBtn){
+      planRegenBtn.addEventListener('click', function(e){
+        e.stopPropagation();
+        showToast('AI 正在重新规划…');
+        triggerAiLoad();
+      });
+    }
+    var planCommitBtn = document.getElementById('plan-commit-btn');
+    if(planCommitBtn){
+      planCommitBtn.addEventListener('click', function(){
+        var onCount = 0;
+        document.querySelectorAll('#pg-plan-ai .plan-chk.on').forEach(function(){ onCount++; });
+        showToast('已加入 ' + onCount + ' 项提醒到日历');
+        var page = document.getElementById('pg-plan-ai');
+        if(page) page.classList.remove('open');
+      });
+    }
+
+    // 首页问候：按时间段切换（宠物第一视角）
+    function timeGreet(){
+      var h = new Date().getHours();
+      if(h >= 5 && h < 12) return '主人早呀';
+      if(h >= 12 && h < 14) return '主人中午好呀';
+      if(h >= 14 && h < 18) return '主人下午好呀';
+      return '主人晚上好呀';
+    }
+    var greetEl = document.getElementById('home-greet');
+    if(greetEl) greetEl.textContent = timeGreet();
+  })();
+</script>
+<div class="toast" id="toast"></div>
+</body>
+</html>
